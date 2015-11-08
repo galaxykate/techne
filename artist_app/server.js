@@ -17,10 +17,11 @@ var bodyParser = require('body-parser');
 var path = require("path");
 var request = require("request"); //library to do basic HTTP requests in node
 
+// and we'll actually need to import a bot
+var Bot = require("./app/artist.js");
+
 // this is the path of the messaging server that keeps track of who is in this commune
 var communeAddress = "http://45.55.28.224:8080"
-var communeHost = '45.55.28.244';
-var communePort = '8080';
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -33,6 +34,46 @@ app.use(express.static('web'));
 
 var port = process.env.PORT || 8081;
 // set our port
+
+// SCHEMA DEFINITIONS
+// ============================================================================
+var Art = require('../shared/models/art.js');
+var Critique = require('../shared/models/critique.js');
+
+// SCHEMA FILLING FUNCTIONS
+// =============================================================================
+var fillArt = function(gen_object){
+    var art = new Art();
+    // fill in art fields with stuff from the in-memory art representation
+    if(gen_object.name){
+	art.name = gen_object.name;
+    }
+    if(gen_object.tree){
+	art.tree = gen_object.tree;
+    }
+    if(gen_object.artist){
+	art.artist = gen_object.artist;
+    }
+    if(gen_object.code){
+	art.content = gen_object.code
+    }
+    return art;
+}
+
+var fillCritique = function(gen_object){
+    var crit = new Critique();
+    // fill in fields from the body
+    if(gen_object.score){
+	crit.score = gen_object.score
+    }
+    if(gen_object.tree || geb_object.opinions){
+    	crit.tree = gen_object.opinions
+    }
+    if(temp_crit.art){
+	crit.art = fillArt(gen_object.art);
+    }
+    return crit;
+}
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -60,8 +101,12 @@ router.route('/critique')
 
 // pass the artist a critique to respond to (accessed at POST http://[serverloc]:8081/techne/artist/critique)
 .post(function(req, res) {
+    var temp_crit = req.body;
+    var crit = fillCritique(temp_crit);
+    bot.respondToCritique(crit);
+
     res.json({
-	message: "I'm not responding to critique right now."
+	message: "Thanks for your input.  It's given me a lot to think over."
     });
 });
 
@@ -71,9 +116,12 @@ router.route('/art')
 
 // get all the art that this artist feels like sharing  with that id (accessed at GET http://[serverloc]:8081/techne/artist/art)
 .get(function(req, res) {
-    res.json({
-	message: "I'm not showing any art right now."
-    });
+    // TODO store art in someplace that isn't memory.
+    var artList = [];
+    for(var i = 0; i < bot.art.length; i++){
+	artList.push(fillArt(bot.art[i]));
+    }
+    res.json(artList);
 });
 
 // on routes that end in /techne/artist/art/:art_id
@@ -92,9 +140,10 @@ router.route('/respond')
 
 // pass this artist an art to critique (accessed at POST http://[serverloc]:8081/techne/artist/respond)
 .post(function(req, res) {
-    res.json({
-	message: "I'm not critiquing art right now."
-    });
+    var art = fillArt(req.body);
+    var crit = fillCritique(bot.evaluateArt(art));
+
+    res.json(crit);
 });
 	
 // REGISTER OUR ROUTES -------------------------------
@@ -136,15 +185,16 @@ console.log("I'm an artist listening on " + port);
 process.on('SIGTERM', shutdownGracefully);
 process.on('SIGINT', shutdownGracefully);
 
-// INTRODUCE YOURSELF LOGIC
-//==============================================================================
 //sub for the actual bot
-var bot = {}
+var bot = new Bot();
+
+// AGENT BEHVOUR LOGIC (INTRODUCTIONS + setInterval) LOOP
+//==============================================================================
 request.post(communeAddress + "/techne/artists", {
     'form': {
 	'type': 'pictures',
 	'location' : '45.55.28.244:8081',
-	'name': 'test_name'
+	'name': bot.name
     }
 }, function(error, response, body){
     if(error){
@@ -154,4 +204,32 @@ request.post(communeAddress + "/techne/artists", {
     var info = JSON.parse(body);    
     bot.locId = info.locId;
     console.log("I should say hi to all my new art friends!");
+    request.get(communeAddress + "/techne/artists", function(error, response, body){
+	if(error){
+	   console.log(error);
+	   bot.fellowBots = undefined;
+	}else if(response.statusCode != 200){
+	   console.log("HTTP ERROR: " + response.statusCode);
+	   bot.fellowBots = undefined;
+	}else{
+	   // we've got a list of bots
+	   var communeBots = JSON.parse(body);
+	   var friendLocations = [];
+	   for(var i = 0; i < communeBots.length; i++){
+		if(communeBots[i]._id == bot.locId){
+		    continue;
+		}
+		friendLocations.push(communeBots[i].location);
+	   }
+	   bot.friendLocations = friendLocations;
+	}
+	// now we've done introductions, check to make sure that we've introduced ourself properly.
+	if(bot.locId == undefined || bot.friendLocations == undefined){
+	    console.log("I had a hard time saying hello.  Communication is weird.");
+	    shutdownGracefully();   
+	}else{
+	    // we've done our introductions correctly.  Start our eval loop.
+	    // TODO
+	} 	 	
+    });
 });

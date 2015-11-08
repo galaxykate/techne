@@ -1,0 +1,7 @@
+{
+    "name": "techne-shared",
+    "main": "server.js",
+    "dependencies": {
+        "mongoose": "~3.6.13"
+    }
+}
