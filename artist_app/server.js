@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 
 app.use(express.static('web'));
 
-var port = process.env.PORT || 8081;
+var port = process.env.PORT || 8080;
 // set our port
 
 // SCHEMA DEFINITIONS
@@ -45,11 +45,11 @@ var Critique = require('../shared/models/critique.js');
 var fillArt = function(gen_object){
     var art = new Art();
     // fill in art fields with stuff from the in-memory art representation
-    if(gen_object.name){
-	art.name = gen_object.name;
+    if(gen_object.title){
+	art.name = gen_object.title;
     }
-    if(gen_object.tree){
-	art.tree = gen_object.tree;
+    if(gen_object.reducedTree){ // TODO make this more general
+	art.tree = gen_object.reducedTree;
     }
     if(gen_object.artist){
 	art.artist = gen_object.artist;
@@ -67,7 +67,11 @@ var fillCritique = function(gen_object){
 	crit.score = gen_object.score
     }
     if(gen_object.tree || geb_object.opinions){
-    	crit.tree = gen_object.opinions
+    	if(gen_object.opinions){
+		crit.tree = gen_object.opinions
+	}else if(gen_object.tree){
+		crit.tree = gen_object.tree
+	}
     }
     if(temp_crit.art){
 	crit.art = fillArt(gen_object.art);
@@ -118,6 +122,8 @@ router.route('/art')
 .get(function(req, res) {
     // TODO store art in someplace that isn't memory.
     var artList = [];
+    console.log("Someone asked me for all my art.  I can't wait to show them what I've been making!");
+    var artList = [];
     for(var i = 0; i < bot.art.length; i++){
 	artList.push(fillArt(bot.art[i]));
     }
@@ -140,10 +146,14 @@ router.route('/respond')
 
 // pass this artist an art to critique (accessed at POST http://[serverloc]:8081/techne/artist/respond)
 .post(function(req, res) {
-    var art = fillArt(req.body);
-    var crit = fillCritique(bot.evaluateArt(art));
+    setTimeout(function(){
+    	console.log("Someone gave me an art to critique, I'm honored!");
+    	console.log(req.body);
+	var art = fillArt(req.body);
+    	var crit = fillCritique(bot.evaluateArt(art));
 
-    res.json(crit);
+        res.json(crit);
+    }, 1000);
 });
 	
 // REGISTER OUR ROUTES -------------------------------
@@ -193,7 +203,7 @@ var bot = new Bot();
 request.post(communeAddress + "/techne/artists", {
     'form': {
 	'type': 'pictures',
-	'location' : '45.55.28.244:8081',
+	'location' : 'http://45.55.28.244:' + port,
 	'name': bot.name
     }
 }, function(error, response, body){
@@ -224,12 +234,47 @@ request.post(communeAddress + "/techne/artists", {
 	   bot.friendLocations = friendLocations;
 	}
 	// now we've done introductions, check to make sure that we've introduced ourself properly.
-	if(bot.locId == undefined || bot.friendLocations == undefined){
-	    console.log("I had a hard time saying hello.  Communication is weird.");
-	    shutdownGracefully();   
-	}else{
+	if(bot.locId != undefined && bot.friendLocations != undefined){
+	    console.log("Ok, I've said hi to everyone and settled in...");
 	    // we've done our introductions correctly.  Start our eval loop.
-	    // TODO
+	    setInterval(function(){
+		console.log("I'm going to create a new art!");
+		var newestArt = fillArt(bot.createArt());	
+		// check to see if anyone new has joined the commune.
+		request.get(communeAddress + "/techne/artists", function(error, response, body){
+		    if(error){
+			console.log(error);
+		    }else if(response.statusCode != 200){
+			console.log("HTTP ERROR: " + response.statusCode);
+		    }else{
+			// we've got a list of bots
+			var communeBots = JSON.parse(body);
+			var friendLocations = [];
+			for(var i = 0; i < communeBots.length; i++){
+			    if(communeBots[i]._id == bot.locId){
+		    		continue;
+			    }
+			    friendLocations.push(communeBots[i].location);
+	   	        }
+	   	        bot.friendLocations = friendLocations;
+			for(var locIdx = 0; locIdx < bot.friendLocations.length; locIdx++){
+			    console.log("Asking my friend at " + bot.friendLocations[locIdx] + " for some critique...");
+			    request.post(bot.friendLocations[locIdx] + "/techne/artist/respond", {
+				'form': newestArt
+			    }, function(error, response, body){
+				if(error){
+				    console.log(error);
+				}else{
+				    console.log("I got a critique back!");
+				    console.log(body);
+				    var crit = fillCritique(JSON.parse(body));
+				    bot.respondToCritique(crit);
+				}				
+			    });
+			}
+		    }
+		});
+	    }, 5*60*1000);
 	} 	 	
     });
 });
