@@ -45,37 +45,30 @@ var Critique = require('../shared/models/critique.js');
 var fillArt = function(gen_object){
     var art = new Art();
     // fill in art fields with stuff from the in-memory art representation
-    if(gen_object.title){
-	art.name = gen_object.title;
-    }
-    if(gen_object.reducedTree){ // TODO make this more general
-	art.tree = gen_object.reducedTree;
-    }
+    art.title = gen_object.title || gen_object.name;
+    art.tree = gen_object.reducedTree || gen_object.tree;
     if(gen_object.artist){
 	art.artist = gen_object.artist;
     }
-    if(gen_object.code){
-	art.content = gen_object.code
-    }
+    art.content = gen_object.code || gen_object.content;
     return art;
 }
 
 var fillCritique = function(gen_object){
     var crit = new Critique();
     // fill in fields from the body
-    if(gen_object.score){
-	crit.score = gen_object.score
-    }
-    if(gen_object.tree || geb_object.opinions){
+    crit.score = gen_object.score;
+    if(gen_object.tree || gen_object.opinions){
     	if(gen_object.opinions){
 		crit.tree = gen_object.opinions
 	}else if(gen_object.tree){
 		crit.tree = gen_object.tree
 	}
     }
-    if(temp_crit.art){
+    if(gen_object.art){
 	crit.art = fillArt(gen_object.art);
     }
+
     return crit;
 }
 
@@ -146,14 +139,16 @@ router.route('/respond')
 
 // pass this artist an art to critique (accessed at POST http://[serverloc]:8081/techne/artist/respond)
 .post(function(req, res) {
-    setTimeout(function(){
+    try{
     	console.log("Someone gave me an art to critique, I'm honored!");
-    	console.log(req.body);
 	var art = fillArt(req.body);
     	var crit = fillCritique(bot.evaluateArt(art));
 
         res.json(crit);
-    }, 1000);
+    } catch(e){
+        console.log(e);
+        shutdownGracefully();
+    }
 });
 	
 // REGISTER OUR ROUTES -------------------------------
@@ -259,11 +254,20 @@ request.post(communeAddress + "/techne/artists", {
 	   	        bot.friendLocations = friendLocations;
 			for(var locIdx = 0; locIdx < bot.friendLocations.length; locIdx++){
 			    console.log("Asking my friend at " + bot.friendLocations[locIdx] + " for some critique...");
-			    request.post(bot.friendLocations[locIdx] + "/techne/artist/respond", {
-				'form': newestArt
+			    console.log(bot.friendLocations[locIdx] + "/techne/artist/respond");
+			    request.post(bot.friendLocations[locIdx] + "/techne/artist/respond",{
+				'form': {
+				    'title': newestArt.title,
+				    'tree': newestArt.tree,
+				    '_id': newestArt._id,
+				    'code': newestArt.content
+				}
 			    }, function(error, response, body){
 				if(error){
+				    console.log("Got an error back.");
 				    console.log(error);
+				    console.log(response);
+				    console.log(body);
 				}else{
 				    console.log("I got a critique back!");
 				    console.log(body);

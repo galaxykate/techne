@@ -2,8 +2,8 @@
  * @author Kate and Johnathan
  * Create a virtual artist
  */
-var tracery = require('./tracery.js'); //Powered by the Tracery grammar engine
-var grammar = require('./grammar.js'); //Some prefab grammars that are useful for things
+//var tracery = require('./tracery.js'); //Powered by the Tracery grammar engine
+//var grammar = require('./grammar.js'); //Some prefab grammars that are useful for things
 // coping the getRandom function from the main app file
 var getRandom = function(a){
 	return a[Math.floor(Math.random() * a.length)]
@@ -279,7 +279,7 @@ Bot.prototype.respondToCritique = function(critique) {
     var score = critique.score
     if (score == 0){
 		//we don't do any part of what the critique talks about.  Engage sellout mode
-		console.log(this.name + " has gone into 'sellout' mode.");
+		console.log(this.name + " hase gone into 'sellout' mode.");
 		this.openness = 1;
 		this.drive = 0;
     }
@@ -343,4 +343,4 @@ Bot.prototype.displayArt = function() {
     });
 };
 
-module.exports = Bot;
+//module.exports = Bot;

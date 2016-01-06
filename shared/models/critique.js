@@ -9,7 +9,7 @@ var Schema       = mongoose.Schema;
 
 var CritiqueSchema   = new Schema({
     tree: Schema.Types.Mixed,
-    score: Array,
+    score: Number,
     art: {type: mongoose.Schema.Types.ObjectId, ref: 'Art'}
 });
 
