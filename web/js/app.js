@@ -3,9 +3,9 @@
  */
 
 
-    function getRandom(a) {
-        return a[Math.floor(Math.random() * a.length)];
-    }
+function getRandom(a) {
+    return a[Math.floor(Math.random() * a.length)];
+}
 
 function createCard(data) {
     var card = {};
@@ -44,54 +44,61 @@ $(document).ready(function() {
     $("#addArtist").click(function() {
         var bot = new Bot();
         bots.push(bot);
-        $.ajax({
-            type : "POST",
-            data : bot.toData(),
-            url : "http://127.0.0.1:8080/api/bears",
-
-        }).then(function(data) {
-
-            refreshArtists();
-        });
+        refreshArtists();
     });
 
-    $("#clearAll").click(function() {
-        $.ajax({
-            url : "http://127.0.0.1:8080/api/bears",
+    $("#interact").click(function() {
+        for(var i = 0; i < bots.length; i++){
+            var interactor = bots[i];
+            for(var j = 0; j < bots.length; j++) {
+                if ( i == j){
+                    continue;
+                }
+                var interactee = bots[j];
 
-        }).then(function(data) {
-            console.log("Got all bears for deletion");
-            for (var i = 0; i < data.length; i++) {
+                //have the interactor evaluate the most recent art
+                critique = interactor.evaluateArt(interactee.art[interactee.art.length - 1]);
 
-                console.log("Delete " + data[i]._id);
-                $.ajax({
-                    type : "DELETE",
-
-                    url : "http://127.0.0.1:8080/api/bears/" + data[i]._id,
-
-                }).then(function() {
-
-                    refreshArtists(data);
-                });
+                interactee.respondToCritique(critique);
             }
-        });
+        }
+
+        //and clear everyone's art so we can see how new art
+        //for(var i = 0; i < bots.length; i++){
+        //    bots[i].art = [];
+        //}
     });
+
+    //$("#clearAll").click(function() {
+    //    $.ajax({
+    //        url : "http://127.0.0.1:8080/api/bears",
+
+    //    }).then(function(data) {
+    //        console.log("Got all bears for deletion");
+    //        for (var i = 0; i < data.length; i++) {
+
+                //console.log("Delete " + data[i]._id);
+    //            refreshArtists(data);
+                //$.ajax({
+                //    type : "DELETE",
+
+                //    url : "http://127.0.0.1:8080/api/bears/" + data[i]._id,
+
+                //}).then(function() {
+
+                //    refreshArtists(data);
+                //});
+    //        }
+    //    });
+    //});
+
     function refreshArtists(data) {
-
         console.log("refresh artists");
-
-        $.ajax({
-            url : "http://127.0.0.1:8080/api/bears",
-
-        }).then(function(data) {
-            var holder = $("#artists");
-            holder.html("");
-            for (var i = 0; i < bots.length; i++) {
-                bots[i].display(holder);
-            }
-
-        });
-
+        var holder = $("#artists");
+        holder.html("");
+        for (var i = 0; i < bots.length; i++) {
+            bots[i].display(holder);
+        }
     }
 
     refreshArtists();
