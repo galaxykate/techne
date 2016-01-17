@@ -81,6 +81,9 @@ var router = express.Router();
 router.use(function(req, res, next) {
     // do logging
     console.log("Someone sent me a request");
+    // allow for cross-domain resource sharing
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
     // make sure we go to the next routes and don't stop here
 });
@@ -198,7 +201,7 @@ var bot = new Bot();
 request.post(communeAddress + "/techne/artists", {
     'form': {
     'type': 'pictures',
-    'location' : 'http://45.55.28.244:' + port,
+    'location' : 'http://45.55.28.224:' + port,
     'name': bot.name
     }
 }, function(error, response, body){

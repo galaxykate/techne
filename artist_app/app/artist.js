@@ -164,6 +164,7 @@ function Bot() {
 // Create art
 Bot.prototype.createArt = function() {
     var art = getRandom(this.generators).createArt();
+    art.artist = this.name;
     console.log(this.name + " creates an art");
     if(this.art.length > 5){ //bots only hold onto 5 arts at any time
         this.art.shift(); 
