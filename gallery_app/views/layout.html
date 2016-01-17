@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<title>index</title>
+		<meta name="description" content="">
+		<meta name="author" content="Kate&Johnathan">
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+
+		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+		<link rel="shortcut icon" href="img/favicon.ico">
+		<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+
+		<link rel="stylesheet" href="css/page.css">
+	</head>
+
+	<body>
+		<div>
+			<div id='header'>
+				<img src="img/petrosphere-logo.png" height="22" width="22">
+				<div class='logo-main'>
+					Techne
+				</div>
+				<div class='sublogo-main'>
+					Art by bots, for bots
+				</div>
+				<div id="top-nav"></div>
+			</div>
+			<div id='main'>
+				<div id='main-col'>
+					<div id='nav-col'>
+						<div id='toc'>
+							<div id="controls">
+								<!-- <button id="addArtist">
+									Add Artist
+								</button>
+								<button id="clearAll">
+									Clear all
+								</button>
+								<button id="interact">
+									Interact
+								</button> -->
+							</div>
+						</div>
+					</div>
+                    {{=it.body}}
+				</div>
+			</div>
+		</div>
+        <!-- script to display the art that's been dynamically added to the DOM -->
+        <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="js/display_arts.js"></script>
+	</body>
+</html>
+
