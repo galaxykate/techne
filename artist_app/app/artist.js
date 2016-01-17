@@ -6,12 +6,12 @@ var tracery = require('./tracery.js'); //Powered by the Tracery grammar engine
 var grammar = require('./grammar.js'); //Some prefab grammars that are useful for things
 // coping the getRandom function from the main app file
 var getRandom = function(a){
-	return a[Math.floor(Math.random() * a.length)]
+    return a[Math.floor(Math.random() * a.length)]
 }
 
 //a simplified tracery node for communication
 function ArtNode(){
-	this.children = [];
+    this.children = [];
 }
 
 function Generator() {
@@ -59,31 +59,31 @@ Generator.prototype.createArt = function() {
 };
 
 Generator.prototype.createReducedTree = function(traceryTreeNode, reducedTreeNode){
-	switch(traceryTreeNode.type){
-		case -1:
-			//node is a root
-			reducedTreeNode.lhs = traceryTreeNode.childRule
-			reducedTreeNode.rhs = traceryTreeNode.childRule
-			break;
-		case 0:
-			//node is a leaf
-			reducedTreeNode.lhs = traceryTreeNode.raw
-			reducedTreeNode.rhs = traceryTreeNode.finishedText
-			break;
-		case 1:
-			//node is in the middle somewhere
-			reducedTreeNode.lhs = traceryTreeNode.raw
-			reducedTreeNode.rhs = traceryTreeNode.childRule
-			break;
-	}
+    switch(traceryTreeNode.type){
+        case -1:
+            //node is a root
+            reducedTreeNode.lhs = traceryTreeNode.childRule
+            reducedTreeNode.rhs = traceryTreeNode.childRule
+            break;
+        case 0:
+            //node is a leaf
+            reducedTreeNode.lhs = traceryTreeNode.raw
+            reducedTreeNode.rhs = traceryTreeNode.finishedText
+            break;
+        case 1:
+            //node is in the middle somewhere
+            reducedTreeNode.lhs = traceryTreeNode.raw
+            reducedTreeNode.rhs = traceryTreeNode.childRule
+            break;
+    }
 
-	if(traceryTreeNode.children){
-		for(var i = 0; i < traceryTreeNode.children.length; i++){
-			reducedTreeNode.children.push(this.createReducedTree(traceryTreeNode.children[i], new ArtNode()));
-		}
-	}
+    if(traceryTreeNode.children){
+        for(var i = 0; i < traceryTreeNode.children.length; i++){
+            reducedTreeNode.children.push(this.createReducedTree(traceryTreeNode.children[i], new ArtNode()));
+        }
+    }
 
-	return reducedTreeNode;
+    return reducedTreeNode;
 };
 
 function Opinion(basis) {
@@ -105,7 +105,7 @@ Opinion.prototype.applyOpinion = function(artNode, feeling) {
         return feeling
     }
 
-	//I see the thing I like!
+    //I see the thing I like!
     if(nodeVal == this.rhs && nodeCtx == this.lhs){
         feeling = feeling + 1
     }
@@ -135,14 +135,14 @@ function Bot() {
     this.name = grammar.flatten("#botName#");
     this.art = [];
 
-	//openness is how likely I am to use someone else's ideas.
-	//if openness is <= 0 I don't care about other's critique and won't use it
-	//in my art
+    //openness is how likely I am to use someone else's ideas.
+    //if openness is <= 0 I don't care about other's critique and won't use it
+    //in my art
     this.openness = 0; //for right now, we want bots to be very mutable.
 
-	//drive is how likely I am to let my own feelings effect how I make art
-	//if drive <= 0, I don't care how I feel about art (selling out)
-	this.drive = 0;
+    //drive is how likely I am to let my own feelings effect how I make art
+    //if drive <= 0, I don't care how I feel about art (selling out)
+    this.drive = 0;
 
     // Create ways of making art
     this.generators = [];
@@ -164,22 +164,27 @@ function Bot() {
 // Create art
 Bot.prototype.createArt = function() {
     var art = getRandom(this.generators).createArt();
+    art.artist = this.name;
     console.log(this.name + " creates an art");
+    if(this.art.length > 5){ //bots only hold onto 5 arts at any time
+        this.art.shift(); 
+    }
+
     this.art.push(art);
 
     artSelfEvaluation = this.evaluateArt(art);
-	if(artSelfEvaluation.score == 0){
-		//we have nothing of the thing we like in this art.  Flip From
-		//sellout mode to internal drive mode
-		console.log(this.name + " hase gone into 'fuck 'em' mode.");
-		this.drive = 1;
-		this.openness = 0;
-	}
+    if(artSelfEvaluation.score == 0){
+        //we have nothing of the thing we like in this art.  Flip From
+        //sellout mode to internal drive mode
+        console.log(this.name + " hase gone into 'fuck 'em' mode.");
+        this.drive = 1;
+        this.openness = 0;
+    }
 
-	if(this.drive > 0){
-		//allow how we feel about art to change how we make art
-		this.findInspiration(artSelfEvaluation);
-	}
+    if(this.drive > 0){
+        //allow how we feel about art to change how we make art
+        this.findInspiration(artSelfEvaluation);
+    }
 
     return art;
 };
@@ -217,60 +222,60 @@ Bot.prototype.evaluateArt = function(art) {
 Bot.prototype.findInspiration = function(critique){
     var tree = critique.tree //this is a list of tree nodes that contain my opinions.
 
-	var randGenIndx = Math.floor(Math.random() * this.generators.length);
+    var randGenIndx = Math.floor(Math.random() * this.generators.length);
 
-	//TODO: right now, opinions are single elements.  We can do better (constructive critism?)
-	var opinionToIncorperate = getRandom(tree);
+    //TODO: right now, opinions are single elements.  We can do better (constructive critism?)
+    var opinionToIncorperate = getRandom(tree);
 
-	console.log("I'm gonna try " + opinionToIncorperate.rhs);
-	var generatorToUpdate = this.generators[randGenIndx]; //pick a random generator
+    console.log("I'm gonna try " + opinionToIncorperate.rhs);
+    var generatorToUpdate = this.generators[randGenIndx]; //pick a random generator
 
-	var addedIn = false;
-	for (var lhs in generatorToUpdate.raw){
-		if(generatorToUpdate.raw.hasOwnProperty(lhs)){
-			if(generatorToUpdate.raw[lhs].indexOf(opinionToIncorperate.rhs) > -1){
-				// this bot already can generate art that incorperates this concept,
-				// so lets push it towards making more art that fits this concept.
-				for(var i = 0; i < generatorToUpdate.raw[lhs].length; i++){
-					if(generatorToUpdate.raw[lhs][i] != opinionToIncorperate.rhs){
-						generatorToUpdate.raw[lhs][i] = opinionToIncorperate.rhs;
-						console.log("I already do that, I'll try doing it more.");
-						addedIn = true;
-						break;
-					}
-				}
-			}
-		}
+    var addedIn = false;
+    for (var lhs in generatorToUpdate.raw){
+        if(generatorToUpdate.raw.hasOwnProperty(lhs)){
+            if(generatorToUpdate.raw[lhs].indexOf(opinionToIncorperate.rhs) > -1){
+                // this bot already can generate art that incorperates this concept,
+                // so lets push it towards making more art that fits this concept.
+                for(var i = 0; i < generatorToUpdate.raw[lhs].length; i++){
+                    if(generatorToUpdate.raw[lhs][i] != opinionToIncorperate.rhs){
+                        generatorToUpdate.raw[lhs][i] = opinionToIncorperate.rhs;
+                        console.log("I already do that, I'll try doing it more.");
+                        addedIn = true;
+                        break;
+                    }
+                }
+            }
+        }
 
-		if(addedIn){
-			break;
-		}
-	}
+        if(addedIn){
+            break;
+        }
+    }
 
-	if(!addedIn){
-		// lets let the generator discover some new way of creating art
-		for (var lhs in generatorToUpdate.raw){
-			if(generatorToUpdate.raw.hasOwnProperty(lhs)){
-				if(lhs == opinionToIncorperate.lhs){
-					generatorToUpdate.raw[lhs].push(opinionToIncorperate.rhs);
-					console.log("Hm.  I never through about doing that here before.");
-					addedIn = true;
-					break;
-				}
-			}
-		}
-	}
+    if(!addedIn){
+        // lets let the generator discover some new way of creating art
+        for (var lhs in generatorToUpdate.raw){
+            if(generatorToUpdate.raw.hasOwnProperty(lhs)){
+                if(lhs == opinionToIncorperate.lhs){
+                    generatorToUpdate.raw[lhs].push(opinionToIncorperate.rhs);
+                    console.log("Hm.  I never through about doing that here before.");
+                    addedIn = true;
+                    break;
+                }
+            }
+        }
+    }
 
-	if(!addedIn){
-		//this is an entirely new rule for this bot
-		console.log("I've never even considered that I could do something like that.");
-		generatorToUpdate.raw[opinionToIncorperate.lhs] = [opinionToIncorperate.rhs];
-		addIn = true;
-	}
+    if(!addedIn){
+        //this is an entirely new rule for this bot
+        console.log("I've never even considered that I could do something like that.");
+        generatorToUpdate.raw[opinionToIncorperate.lhs] = [opinionToIncorperate.rhs];
+        addIn = true;
+    }
 
-	//and recompile.
-	this.generators[randGenIndx].grammar = tracery.createGrammar(generatorToUpdate.raw); //recompile the grammar
-	console.log(this.generators[randGenIndx].grammar);
+    //and recompile.
+    this.generators[randGenIndx].grammar = tracery.createGrammar(generatorToUpdate.raw); //recompile the grammar
+    console.log(this.generators[randGenIndx].grammar);
 
 };
 
@@ -278,15 +283,15 @@ Bot.prototype.findInspiration = function(critique){
 Bot.prototype.respondToCritique = function(critique) {
     var score = critique.score
     if (score == 0){
-		//we don't do any part of what the critique talks about.  Engage sellout mode
-		console.log(this.name + " has gone into 'sellout' mode.");
-		this.openness = 1;
-		this.drive = 0;
+        //we don't do any part of what the critique talks about.  Engage sellout mode
+        console.log(this.name + " has gone into 'sellout' mode.");
+        this.openness = 1;
+        this.drive = 0;
     }
 
-	if(this.openness > 0){
-		this.findInspiration(critique);
-	}
+    if(this.openness > 0){
+        this.findInspiration(critique);
+    }
 };
 
 Bot.prototype.display = function(holder) {
