@@ -14,6 +14,7 @@ var express = require('express');
 var app = express();
 // define our app using express
 var bodyParser = require('body-parser');
+
 var path = require("path");
 var request = require("request"); //library to do basic HTTP requests in node
 
@@ -26,13 +27,16 @@ var communeAddress = "http://45.55.28.224:8080"
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({
+    limit: '5mb',
     extended : true
 }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+    limit: '5mb'
+}));
 
 app.use(express.static('web'));
 
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 8081;
 // set our port
 
 // SCHEMA DEFINITIONS
@@ -48,7 +52,7 @@ var fillArt = function(gen_object){
     art.title = gen_object.title || gen_object.name;
     art.tree = gen_object.reducedTree || gen_object.tree;
     if(gen_object.artist){
-    art.artist = gen_object.artist;
+        art.artist = gen_object.artist;
     }
     art.content = gen_object.code || gen_object.content;
     return art;
@@ -60,17 +64,18 @@ var fillCritique = function(gen_object){
     crit.score = gen_object.score;
     if(gen_object.tree || gen_object.opinions){
         if(gen_object.opinions){
-        crit.tree = gen_object.opinions
-    }else if(gen_object.tree){
-        crit.tree = gen_object.tree
-    }
+            crit.tree = gen_object.opinions
+        }else if(gen_object.tree){
+            crit.tree = gen_object.tree
+        }
     }
     if(gen_object.art){
-    crit.art = fillArt(gen_object.art);
+        crit.art = fillArt(gen_object.art);
     }
 
     return crit;
 }
+
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -82,8 +87,8 @@ router.use(function(req, res, next) {
     // do logging
     console.log("Someone sent me a request");
     // allow for cross-domain resource sharing
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    //res.header("Access-Control-Allow-Origin", "*");
+    //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
     // make sure we go to the next routes and don't stop here
 });
@@ -94,6 +99,7 @@ router.get('/', function(req, res) {
         message : "Hello, I'm a bot that's currently part of Techne."
     });
 });
+
 
 // on routes that end in /techne/artist/critique
 // ----------------------------------------------------
@@ -142,16 +148,11 @@ router.route('/respond')
 
 // pass this artist an art to critique (accessed at POST http://[serverloc]:8081/techne/artist/respond)
 .post(function(req, res) {
-    try{
-        console.log("Someone gave me an art to critique, I'm honored!");
+    console.log("Someone gave me an art to critique, I'm honored!");
     var art = fillArt(req.body);
-        var crit = fillCritique(bot.evaluateArt(art));
+    var crit = fillCritique(bot.evaluateArt(art));
 
-        res.json(crit);
-    } catch(e){
-        console.log(e);
-        shutdownGracefully();
-    }
+    res.json(crit);
 });
     
 // REGISTER OUR ROUTES -------------------------------
@@ -166,8 +167,8 @@ var shutdownGracefully = function(){
     console.log("... I promise I'm saying goodbye right now.");
     request.del(communeAddress + "/techne/artist/" + bot.locId, function(error, response, body){
         if(error){
-        console.log(bot.locId);
-        console.log(error);
+            console.log(bot.locId);
+            console.log(error);
         }
         process.exit();
        });
@@ -241,44 +242,45 @@ request.post(communeAddress + "/techne/artists", {
         // check to see if anyone new has joined the commune.
         request.get(communeAddress + "/techne/artists", function(error, response, body){
             if(error){
-            console.log(error);
+                console.log(error);
             }else if(response.statusCode != 200){
-            console.log("HTTP ERROR: " + response.statusCode);
+                console.log("HTTP ERROR: " + response.statusCode);
             }else{
-            // we've got a list of bots
-            var communeBots = JSON.parse(body);
-            var friendLocations = [];
-            for(var i = 0; i < communeBots.length; i++){
-                if(communeBots[i]._id == bot.locId){
-                    continue;
-                }
-                friendLocations.push(communeBots[i].location);
+                // we've got a list of bots
+                var communeBots = JSON.parse(body);
+                var friendLocations = [];
+                for(var i = 0; i < communeBots.length; i++){
+                    if(communeBots[i]._id == bot.locId){
+                        continue;
+                    }
+                    friendLocations.push(communeBots[i].location);
                 }
                 bot.friendLocations = friendLocations;
-            for(var locIdx = 0; locIdx < bot.friendLocations.length; locIdx++){
-                console.log("Asking my friend at " + bot.friendLocations[locIdx] + " for some critique...");
-                console.log(bot.friendLocations[locIdx] + "/techne/artist/respond");
-                request.post(bot.friendLocations[locIdx] + "/techne/artist/respond",{
-                'form': {
-                    'title': newestArt.title,
-                    'tree': newestArt.tree,
-                    '_id': newestArt._id,
-                    'code': newestArt.content
+                
+                for(var locIdx = 0; locIdx < bot.friendLocations.length; locIdx++){
+                    console.log("Asking my friend at " + bot.friendLocations[locIdx] + " for some critique...");
+                    console.log(bot.friendLocations[locIdx] + "/techne/artist/respond");
+                    request.post(bot.friendLocations[locIdx] + "/techne/artist/respond",{
+                        'form': {
+                            'title': newestArt.title,
+                            'tree': newestArt.tree,
+                            '_id': newestArt._id,
+                            'code': newestArt.content
+                        }
+                    }, function(error, response, body){
+                        if(error){
+                            console.log("Got an error back.");
+                            console.log(error);
+                            console.log(response);
+                            console.log(body);
+                        }else{
+                            console.log("I got a critique back!");
+                            console.log(body);
+                            var crit = fillCritique(JSON.parse(body));
+                            bot.respondToCritique(crit);
+                        }               
+                    });
                 }
-                }, function(error, response, body){
-                if(error){
-                    console.log("Got an error back.");
-                    console.log(error);
-                    console.log(response);
-                    console.log(body);
-                }else{
-                    console.log("I got a critique back!");
-                    console.log(body);
-                    var crit = fillCritique(JSON.parse(body));
-                    bot.respondToCritique(crit);
-                }               
-                });
-            }
             }
         });
         }, 5*60*1000);
