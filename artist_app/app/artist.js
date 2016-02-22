@@ -6,8 +6,8 @@ var tracery = require('./tracery.js'); //Powered by the Tracery grammar engine
 var grammar = require('./grammar.js'); //Some prefab grammars that are useful for things
 // coping the getRandom function from the main app file
 var getRandom = function(a){
-    return a[Math.floor(Math.random() * a.length)]
-}
+    return a[Math.floor(Math.random() * a.length)];
+};
 
 //a simplified tracery node for communication
 function ArtNode(){
@@ -20,12 +20,12 @@ function Generator() {
     var hexDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
     function randomHex() {
         return "\\#" + getRandom(hexDigits) + getRandom(hexDigits) + getRandom(hexDigits) + getRandom(hexDigits) + getRandom(hexDigits) + getRandom(hexDigits);
-    };
+    }
 
     this.shapes = ['rect width="#num#" height="#num#" x="#num#" y="#num#"', 'circle cx="#num#" cy="#num#" r="#num#"', 'polygon points="#num#,#num# #num#,#num# #num#,#num#"'];
 
     var raw = {
-        color : [randomHex(), "\\##digit##digit##digit##digit##digit##digit#"],
+        color : [randomHex(), randomHex()],
         digit : ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
         hexdigit : [],
         num : ["#digit##digit#"],
@@ -39,7 +39,7 @@ function Generator() {
     };
     this.raw = raw;
     this.grammar = tracery.createGrammar(raw);
-};
+}
 
 Generator.prototype.createArt = function() {
     var tree = this.grammar.expand("#origin#");
@@ -62,18 +62,18 @@ Generator.prototype.createReducedTree = function(traceryTreeNode, reducedTreeNod
     switch(traceryTreeNode.type){
         case -1:
             //node is a root
-            reducedTreeNode.lhs = traceryTreeNode.childRule
-            reducedTreeNode.rhs = traceryTreeNode.childRule
+            reducedTreeNode.lhs = traceryTreeNode.childRule;
+            reducedTreeNode.rhs = traceryTreeNode.childRule;
             break;
         case 0:
             //node is a leaf
-            reducedTreeNode.lhs = traceryTreeNode.raw
-            reducedTreeNode.rhs = traceryTreeNode.finishedText
+            reducedTreeNode.lhs = traceryTreeNode.raw;
+            reducedTreeNode.rhs = traceryTreeNode.finishedText;
             break;
         case 1:
             //node is in the middle somewhere
-            reducedTreeNode.lhs = traceryTreeNode.raw
-            reducedTreeNode.rhs = traceryTreeNode.childRule
+            reducedTreeNode.lhs = traceryTreeNode.raw;
+            reducedTreeNode.rhs = traceryTreeNode.childRule;
             break;
     }
 
@@ -86,28 +86,28 @@ Generator.prototype.createReducedTree = function(traceryTreeNode, reducedTreeNod
     return reducedTreeNode;
 };
 
-function Opinion(basis) {
+function Opinion(basis, rhs) {
     //My opinions are things I want to see in art.
     this.description = "I score things based on how much of other things they have that I like.";
 
     //gets a symbol from the generator to form an opinion on
-    //currently hardcoded, but we could use reflection to derive this information
-    this.rhs = getRandom(basis.raw.type);
+
+    this.rhs = getRandom(basis.raw[rhs]);
     this.lhs = 'type';
-};
+}
 
 Opinion.prototype.applyOpinion = function(artNode, feeling) {
     // recursively apply this opinion to the art tree
-    var nodeVal = artNode.rhs
-    var nodeCtx = artNode.lhs
+    var nodeVal = artNode.rhs;
+    var nodeCtx = artNode.lhs;
 
-    if (nodeVal == undefined || nodeCtx == undefined){
-        return feeling
+    if (nodeVal === undefined || nodeCtx === undefined){
+        return feeling;
     }
 
     //I see the thing I like!
     if(nodeVal == this.rhs && nodeCtx == this.lhs){
-        feeling = feeling + 1
+        feeling = feeling + 1;
     }
 
     if(artNode.children){
@@ -116,18 +116,18 @@ Opinion.prototype.applyOpinion = function(artNode, feeling) {
         }
     }
 
-    return feeling
+    return feeling;
 };
 
 Opinion.prototype.evaluate = function(art) {
     // this opinion is validated by the number of things I see in the art
-    var fitsOpinion = 0
-    var composition = art.reducedTree || art.tree
-    fitsOpinion = this.applyOpinion(composition, 0)
+    var fitsOpinion = 0;
+    var composition = art.reducedTree || art.tree;
+    fitsOpinion = this.applyOpinion(composition, 0);
 
     return {
         value: fitsOpinion
-    }
+    };
 };
 
 function Bot() {
@@ -137,28 +137,24 @@ function Bot() {
 
     //openness is how likely I am to use someone else's ideas.
     //if openness is <= 0 I don't care about other's critique and won't use it
-    //in my art
-    this.openness = 0; //for right now, we want bots to be very mutable.
-
-    //drive is how likely I am to let my own feelings effect how I make art
-    //if drive <= 0, I don't care how I feel about art (selling out)
-    this.drive = 0;
+    //in my art ('fuck em' mode)
+    this.openness = 0;
 
     // Create ways of making art
     this.generators = [];
     // Create opinions
     this.opinions = [];
-    for (var i = 0; i < 1; i++) {
-        this.generators[i] = new Generator();
-        //form an opinion based on this generator
-        this.opinions[i] = new Opinion(this.generators[i]);
-    }
+
+    this.generators.push(new Generator());
+    //form an opinion based on this generator
+    this.opinions[0] = new Opinion(this.generators[0], "type");
+    this.opinions[1] = new Opinion(this.generators[0], "color");
 
     //lets have some starting art
     for (var i = 0; i < 1; i++) {
         this.createArt();
     }
-};
+}
 
 
 // Create art
@@ -166,22 +162,22 @@ Bot.prototype.createArt = function() {
     var art = getRandom(this.generators).createArt();
     art.artist = this.name;
     console.log(this.name + " creates an art");
-    if(this.art.length > 5){ //bots only hold onto 5 arts at any time
-        this.art.shift(); 
+
+    if(this.art.length > 5){ //bots only hold onto 6 arts at any time
+        this.art.shift();
     }
 
     this.art.push(art);
 
     artSelfEvaluation = this.evaluateArt(art);
-    if(artSelfEvaluation.score == 0){
+    if(artSelfEvaluation.score === 0){
         //we have nothing of the thing we like in this art.  Flip From
         //sellout mode to internal drive mode
         console.log(this.name + " hase gone into 'fuck 'em' mode.");
-        this.drive = 1;
         this.openness = 0;
     }
 
-    if(this.drive > 0){
+    if(this.openness === 0){
         //allow how we feel about art to change how we make art
         this.findInspiration(artSelfEvaluation);
     }
@@ -201,12 +197,12 @@ Bot.prototype.evaluateArt = function(art) {
         var result = this.opinions[i].evaluate(art);
         // result in this case stores how much of thing X art has
         // love is nothing more than an unweighted linear combination of things I like
-        feelingAboutArt = feelingAboutArt + result.value
+        feelingAboutArt = feelingAboutArt + result.value;
     }
     console.log(this.name + " evaluated " + art.title + " and felt " + feelingAboutArt);
 
     //compile opinions in a way that someone else can read
-    opinionVals = []
+    opinionVals = [];
     for(var i = 0; i < this.opinions.length; i++){
         opinionVals.push(this.opinions[i].value);
     }
@@ -215,14 +211,14 @@ Bot.prototype.evaluateArt = function(art) {
         score: feelingAboutArt,
         tree: this.opinions,
         art: art
-    }
+    };
 };
 
 //function to change our generator based on a critique
 Bot.prototype.findInspiration = function(critique){
-    var tree = critique.tree //this is a list of tree nodes that contain my opinions.
+    var tree = critique.tree; //this is a list of tree nodes that contain others opinions.
 
-    var randGenIndx = Math.floor(Math.random() * this.generators.length);
+    var randGenIndx = Math.floor(Math.random() * this.generators.length); //I'm going to change one of my generators over this
 
     //TODO: right now, opinions are single elements.  We can do better (constructive critism?)
     var opinionToIncorperate = getRandom(tree);
@@ -253,7 +249,7 @@ Bot.prototype.findInspiration = function(critique){
     }
 
     if(!addedIn){
-        // lets let the generator discover some new way of creating art
+        //lets let the generator discover some new way of creating art
         for (var lhs in generatorToUpdate.raw){
             if(generatorToUpdate.raw.hasOwnProperty(lhs)){
                 if(lhs == opinionToIncorperate.lhs){
@@ -281,12 +277,11 @@ Bot.prototype.findInspiration = function(critique){
 
 // Respond to a critique
 Bot.prototype.respondToCritique = function(critique) {
-    var score = critique.score
-    if (score == 0){
+    var score = critique.score;
+    if (score === 0){
         //we don't do any part of what the critique talks about.  Engage sellout mode
         console.log(this.name + " has gone into 'sellout' mode.");
         this.openness = 1;
-        this.drive = 0;
     }
 
     if(this.openness > 0){
