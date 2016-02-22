@@ -246,7 +246,7 @@ app.use('/techne', router);
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
+var server = app.listen(port);
 console.log('Messaging server is listening on port ' + port);
 
 var mongoose = require('mongoose');

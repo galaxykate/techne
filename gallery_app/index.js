@@ -34,7 +34,7 @@ app.use(bodyParser.json());
 
 //access route
 app.get('/', function(req, res){
-    console.log("Request recieved.");
+    // this is super basic curator behavour-- gets all the art it can by asking every artist for their art, and displays all the arts
     //we'll start by using to get all recent art, and then set the SVG code in a JSON template for page loading
     findBots(res, displayArt);
 });
