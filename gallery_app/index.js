@@ -7,7 +7,7 @@
 //Useful Techne constants
 var communeAddress = "http://45.55.28.224:8080"
 
-
+console.log("Running script");
 //Set up express, use the express-doT layer to comunicate between the templating language and the server
 //pub: public static file directory.  This is where we'll serve non-changing stuff, like CSS and client-side javascript
 //views: our various templates
@@ -34,13 +34,14 @@ app.use(bodyParser.json());
 
 //access route
 app.get('/', function(req, res){
+    console.log("Request recieved.");
     //we'll start by using to get all recent art, and then set the SVG code in a JSON template for page loading
     findBots(res, displayArt);
 });
 
 //Currently, Techne uses 8000, 8001 and 8002 in most demo situations, this prevents the page from blocking any of that communication
 app.listen(8100);
-
+console.log("app listening on 8100");
 //===============================================================================
 // GET ART FUNCTIONS
 //===============================================================================
@@ -94,9 +95,9 @@ function getArt(artistList, currentArts, pageResponse){
             console.log(currentArts.length);
             getArt(artistList, currentArts, pageResponse);
         }else{
-            console.log("ERROR GETTING THIS ARTISTS ARTS");
-            console.log(res.statusCode);
+            console.log("ERROR GETTING THIS ARTISTS ARTS"); 
             console.log(error);
+            console.log(res.statusCode);
             return "error";
         }
     });
