@@ -86,14 +86,13 @@ Generator.prototype.createReducedTree = function(traceryTreeNode, reducedTreeNod
     return reducedTreeNode;
 };
 
-function Opinion(basis, rhs) {
+function Opinion(basis, lhs) {
     //My opinions are things I want to see in art.
     this.description = "I score things based on how much of other things they have that I like.";
 
-    //gets a symbol from the generator to form an opinion on
-
-    this.rhs = getRandom(basis.raw[rhs]);
-    this.lhs = 'type';
+    //get a branch of the generator to become an opinion
+    this.rhs = getRandom(basis.raw[lhs]);
+    this.lhs = lhs;
 }
 
 Opinion.prototype.applyOpinion = function(artNode, feeling) {

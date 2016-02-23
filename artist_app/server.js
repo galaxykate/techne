@@ -283,7 +283,7 @@ request.post(communeAddress + "/techne/artists", {
                 }
             }
         });
-        }, 5*60*1000);
+        }, 1*30*1000);
     }       
     });
 });
