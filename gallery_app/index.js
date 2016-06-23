@@ -5,7 +5,7 @@
  */
 
 //Useful Techne constants
-var communeAddress = "http://45.55.28.224:8080"
+var communeAddress = "http://45.55.28.224:8080";
 
 console.log("Running script");
 //Set up express, use the express-doT layer to comunicate between the templating language and the server
@@ -37,6 +37,7 @@ app.get('/', function(req, res){
     // this is super basic curator behavour-- gets all the art it can by asking every artist for their art, and displays all the arts
     //we'll start by using to get all recent art, and then set the SVG code in a JSON template for page loading
     findBots(res, displayArt);
+    setInterval(function(){findBots(res, displayArt);}, 1*30*1000);
 });
 
 //Currently, Techne uses 8000, 8001 and 8002 in most demo situations, this prevents the page from blocking any of that communication
@@ -45,7 +46,6 @@ console.log("app listening on 8100");
 //===============================================================================
 // GET ART FUNCTIONS
 //===============================================================================
-
 /**
  * Function to find bots in a commune.  After we get a list of bots, pass that list to the callback and execute it
  */
@@ -57,7 +57,7 @@ function findBots(pageResponse, callback){
             console.log(error);
             var templateData = {galleryArt: error};
             pageResponse.render('index.html', templateData);
-        } 
+        }
     });
 }
 
@@ -71,17 +71,17 @@ function displayArt(pageResponse, artistList){
     if(artList == "error"){
         return;
     }
-};
+}
 
 /**
  * Function to recursively get all the arts
  */
 function getArt(artistList, currentArts, pageResponse){
-    if(artistList.length == 0){
+    if(artistList.length === 0){
         console.log("Display all the work from " + currentArts.length + " artists...");
         //due to some weirdness in doT, put a terminating element in the list
         var templateData = {artList: currentArts};
-        pageResponse.render('index.html', templateData);
+        pageResponse.update('index.html', templateData);
         return "Got all arts";
     }
 
@@ -95,7 +95,7 @@ function getArt(artistList, currentArts, pageResponse){
             console.log(currentArts.length);
             getArt(artistList, currentArts, pageResponse);
         }else{
-            console.log("ERROR GETTING THIS ARTISTS ARTS"); 
+            console.log("ERROR GETTING THIS ARTISTS ARTS");
             console.log(error);
             if(res !== undefined){
                 console.log(res.statusCode);
