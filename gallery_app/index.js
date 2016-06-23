@@ -97,7 +97,9 @@ function getArt(artistList, currentArts, pageResponse){
         }else{
             console.log("ERROR GETTING THIS ARTISTS ARTS"); 
             console.log(error);
-            console.log(res.statusCode);
+            if(res !== undefined){
+                console.log(res.statusCode);
+            }
             return "error";
         }
     });
