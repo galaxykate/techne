@@ -1,0 +1,94 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+     height: 100%;
+}
+
+#main {
+	position: relative;
+	background-color:hsl(290, 90%, 20%);
+	width: 100%;
+	height: 100%;
+}
+
+.section {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+}
+
+.section-header {
+	position: relative;
+	
+	flex: 0 1;
+	width: 100%;
+	min-height: 20px;
+	display: inline-flex;
+	flex-direction: row;
+
+	background-color:hsla(290, 90%, 90%, .2);
+	
+}
+
+.section-title {
+	position: relative;
+	min-height: 15px;
+	padding: 2px 4px;
+	flex: 1 1;
+	
+}
+
+.section-controls {
+	position: relative;
+	
+	min-height: 15px;
+	padding: 2px 4px;
+	flex: 0 1;
+		text-align: right;
+	
+}
+
+.section-control-subsection {
+	display: inline-block;
+	font-size: 8px;
+}
+
+
+
+.section-contents {
+	width: 100%;
+	position: relative;
+	flex: 1 1;
+	padding: 3px;
+	background-color:hsla(290, 90%, 10%, .2);
+		display: inline-flex;
+		overflow-y: scroll;
+		overflow-x: hidden;
+}
+
+#main-columns {
+	flex: 1;
+	max-width: 900px;
+	position: relative;
+	margin: 0px auto;
+	background-color:hsla(290, 90%, 90%, .2);
+	height: 100%;
+
+	display: inline-flex;
+	flex-direction: row;
+}
+
+.main-col {
+	flex: 1;
+}
+
+#left-col {
+		max-width: 220px;
+background-color:hsla(90, 90%, 60%, .9);
+}
+
+#right-col {
+	background-color:hsla(190, 90%, 60%, .9);
+}
