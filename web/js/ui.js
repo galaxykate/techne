@@ -8,6 +8,7 @@ var modes = {
 		title: "Module1: Artists",
 		onStart: function() {
 			// Create n bots
+			clearSim();
 			createGrammarGenerators(1);
 			createArtists(3);
 			createArt(8);
@@ -25,6 +26,7 @@ var modes = {
 		title: "Module2: Critics",
 		onStart: function() {
 			// Create n bots
+			clearSim();
 			createPreferenceGenerators(1);
 			createGrammarGenerators(1);
 
@@ -91,7 +93,7 @@ function createArtCard(holder, art) {
 			html: evalToEmoji(crit.evaluation),
 			class: "art-critdot",
 		}).appendTo(card.critique).css({
-			backgroundColor: "hsl(" + (crit.evaluation * 300) + ",100%,30%)"
+			backgroundColor: "hsl(" + (380 + crit.evaluation * 170)%360 + ",100%," + (crit.evaluation*50 + 20)+ "%)"
 		}).click(function() {
 			selectCritic(crit.critic);
 			selectArt(crit.art);
@@ -198,6 +200,7 @@ function switchMode(mode) {
 		$("#left-col > .section-header > .section-title").html(modeData.title);
 
 		$("#main-entities").html("");
+		$("#side-entities").html("");
 		modeData.onStart();
 
 

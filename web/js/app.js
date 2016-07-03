@@ -1,3 +1,4 @@
+
 var app = {
 	artDim: new Vector(80, 100)
 };
@@ -9,6 +10,3 @@ $(document).ready(function() {
 	// Set the current mode
 	switchMode("module2");
 });
-
-
-
