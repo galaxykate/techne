@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @author Kate
  */
@@ -33,10 +34,16 @@ function createCard(data) {
     }).appendTo(card.div);
     return card;
 }
+=======
+>>>>>>> d80b28b95bd93041e4f7cd68fa15bf10d6a5e87b
 
+var app = {
+	artDim: new Vector(80, 100)
+};
 
 $(document).ready(function() {
 
+<<<<<<< HEAD
     var bots = [];
     var bot = new Bot();
     bots.push(bot);
@@ -102,4 +109,10 @@ $(document).ready(function() {
     }
 
     refreshArtists();
+=======
+	console.log("begin art colony");
+	initUI();
+	// Set the current mode
+	switchMode("module2");
+>>>>>>> d80b28b95bd93041e4f7cd68fa15bf10d6a5e87b
 });
