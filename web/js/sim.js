@@ -73,6 +73,21 @@ function critiqueAll() {
 
 function getCritsFor(art) {
 	return 	sim.critiques.filter(function(crit) {
-return crit.art === art;
+		return crit.art === art;
 	});
+}
+
+/**
+ * Get the pixel values for a particular art.
+ * TODO: this might not be where this function wants to live forever, but it's
+ * where it lives right now
+ * @param  {object} art An SVG Art
+ * @return {Array}     the pixel data for this art
+ */
+function svgToPixels(art){
+	if(!art.svg){
+		console.log("Art doesn't have an SVG representation!");
+	}
+
+	
 }
