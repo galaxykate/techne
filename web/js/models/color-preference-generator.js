@@ -14,49 +14,56 @@ function randColor(){
   return {r: r, g: g, b: b};
 }
 
-class ColorPreference extends PreferenceGenerator {
-  constructor(){
+var ColorPreferenceGenerator = PreferenceGenerator.extend({
+  init : function(){
     //optional parameter color.  We can either generate one here, or get a
     //color from elserwhere
-    super();
+    this._super();
     this.name = "ColorPreference" + this.id; //overwrite the names
-  }
+  },
 
-  generate(color){
+  generate: function(color){
     //generate a color preference
     //we may provide a color for the preference to use, but we also might not.
     //    We expect provided colors to be an object with r (0-255) g (0-255) b (0-255)
-    var favHue;
+    var favColor;
     if(color){
-      favHue = color;
+      favColor = color;
     }else{
-      favHue = randColor();
+      favColor = randColor();
     }
 
     var preference = {
-      favoriteHue: favHue,
+      favoriteHue: rgbTohsv(favColor).hue,  //these two bits are conflated somewhat.  favoriteHue is the hue reading from the  favoriteColor rgb
+      favoriteColor: favColor,
       evaluate: function(art){
         //expecting that art has a property called pixels that has
         //pixel data for the art
         if(art.pixels){
           //TODO: assume rgba pixel structure, and right now we don't really care
-          //about the width
+          //about the alpha part
           var score = 0;
+          console.log(this.favoriteColor);
           for(let i = 0; i < art.pixels.length; i += 4){
-            if(r == art.pixels[i] && g == art.pixels[i+1] && b == art.pixels[i+2]){
+            if(this.favoriteColor.r == art.pixels[i] || this.favoriteColor.g == art.pixels[i+1] || this.favoriteColor.b == art.pixels[i+2]){
               score += 1;
             }
           }
+          return score;
         }else{
           //TODO: talk about structure here.  Each preference, in it's closure, also
           //has a generic 'handle failure' function.
           handleUnableToEvaluate();
+          return -1;
         }
       },
+
       handleUnableToEvaluate: function(){
         //what we do when we can't apply this preference to the art
         console.log("Unable to evaluate provided art object!");
       }
     };
+
+    return preference;
   }
-}
+});

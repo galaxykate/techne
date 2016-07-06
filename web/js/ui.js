@@ -2,7 +2,7 @@ var ui = {
 	cards: [],
 	mode: null
 
-}
+};
 var modes = {
 	"module1": {
 		title: "Module1: Artists",
@@ -45,14 +45,14 @@ var modes = {
 			});
 		},
 	}
-}
+};
 
 /*
  * User selections and highlights
  */
 
 function selectCritic(critic) {
-	console.log("select critic")
+	console.log("select critic");
 	$(".card-critic").removeClass("selected");
 	$(".card-critic" + critic.id).addClass("selected");
 	ui.selectedCritic = critic;
@@ -64,7 +64,7 @@ function selectArt(art) {
 	ui.selectedArt = art;
 }
 
-/* 
+/*
  * Create cards for individual art
  */
 function createArtCard(holder, art) {
@@ -86,7 +86,7 @@ function createArtCard(holder, art) {
 
 	// Make dots for each critique
 	var critiques = getCritsFor(art);
-	console.log(critiques);
+	//console.log(critiques);
 
 	$.each(critiques, function(index, crit) {
 		var dot = $("<div/>", {
@@ -131,7 +131,7 @@ function createCriticCard(holder, critic) {
 	var hue = critic.preference.favoriteHue;
 	card.favoriteColor = $("<div/>", {
 		class: "card-info",
-		html: "favorite hue: <span STYLE='font-weight:bold;color:hsl(" + (hue * 360) + ",90%,70%);background:hsl(" + (hue * 360) + ",90%,30%)'>" + hue.toFixed(2) + "</span>"
+		html: "favorite hue: <span STYLE='font-weight:bold;color:hsl(" + hue + ",90%,70%);background:hsl(" + hue + ",90%,30%)'>" + hue.toFixed(2) + "</span>"
 	}).appendTo(card.contents);
 
 
@@ -153,7 +153,7 @@ function createArtistCard(holder, artist) {
 		$("<div/>", {
 			class: "art-minithumbnail",
 			html: art.svg
-		}).appendTo(card.contents)
+		}).appendTo(card.contents);
 	});
 
 
@@ -187,7 +187,7 @@ function initUI() {
 
 	select.change(function() {
 		switchMode($(this).val());
-	})
+	});
 }
 
 function switchMode(mode) {
@@ -251,20 +251,20 @@ var formatCode = function(code, stripWhiteSpaces, stripEmptyLines) {
 	}
 
 	return result;
-}
+};
 
 
 function evalToEmoji(ev) {
 
-	if (ev < .1)
+	if (ev < 0.1)
 		return "💀";
-	if (ev < .2)
+	if (ev < 0.2)
 		return "💩";
-	if (ev < .4)
+	if (ev < 0.4)
 		return "😐";
-	if (ev < .6)
+	if (ev < 0.6)
 		return "👍";
-	if (ev < .8)
+	if (ev < 0.8)
 		return "🙌";
 	return "💯";
 
