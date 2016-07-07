@@ -26,20 +26,14 @@ var Card = Class.extend({
 
 
 		// Controls
-		this.controls = $("<div/>", {
-			class: "section-controls"
-		}).appendTo(this.header);
-
-		this.expandToggle = $("<div/>", {
-			class: "section-control-subsection",
-			html: "▾"
-		}).appendTo(this.controls).click(function() {
-			console.log("toggle");
-			card.toggleOpen();
-		});
 
 		this.customControls = $("<div/>", {
 			class: "section-control-subsection"
+		}).appendTo(this.header);
+
+
+		this.controls = $("<div/>", {
+			class: "section-controls"
 		}).appendTo(this.header);
 
 		// Details
