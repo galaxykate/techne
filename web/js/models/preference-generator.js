@@ -1,5 +1,5 @@
+//number of preference generators out there
 var preferenceGeneratorCount = 0;
-
 
 // Creates factories that output heuristic functions
 var PreferenceGenerator = Class.extend({

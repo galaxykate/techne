@@ -1,8 +1,6 @@
 /**
  * @author Kate
  */
-// Kulturkreis (roughly, "culture circle" or "cultural field") the notion of a culture complex as an entity that develops from a centre of origin and becomes diffused over large areas of the world.
-// bothemia?
 
 // server.js
 
