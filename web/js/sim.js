@@ -57,8 +57,10 @@ function createArtists(count) {
 // Each bot creates N arts
 function createArt(count) {
 	for (var i = 0; i < sim.artists.length; i++) {
-		var art = sim.artists[i].createArt(count);
-		sim.art = sim.art.concat(art);
+		var art = sim.artists[i].createArt(count, function() {
+			sim.art = sim.art.concat(art);
+		});
+		
 	}
 }
 
