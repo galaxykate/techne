@@ -24,7 +24,6 @@ function svgToCanvas(svgString, canvas, callback) {
 		//draw the image to the canvas
 		ctx.drawImage(img[0], 0, 0);
 		var pixels = ctx.getImageData(0, 0, canvas.width(), canvas.height()).data;
-		console.log(pixels);
 		//pack all important info into an object to send off to a callback.
 		//Width and Height can let us do reconstructions of the original image if we want
 		//pack all important info into an object to send off to a callback.

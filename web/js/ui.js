@@ -85,18 +85,19 @@ function createArtCard(holder, art) {
 	}).appendTo(card.contents);
 
 
-	// TEST CANVAS
-	// Create a test canvas
-	card.canvasHolder = $("<div/>", {
+	// View test information on this art
+	card.artDebugInfo = $("<div/>", {
 		class: "art-thumbnail",
-		html: "canvas<br>"
+		html: "img<br>"
 	}).appendTo(card.contents);
-
-
 
 	card.pixelBar = $("<div/>", {
 		class: "pixelbar",
-	}).appendTo(card.canvasHolder);
+	}).appendTo(card.artDebugInfo);
+
+	card.artCalculations = $("<div/>", {
+		class: "art-calculations",
+	}).appendTo(card.artDebugInfo);
 
 
 	// Critique
@@ -106,8 +107,7 @@ function createArtCard(holder, art) {
 
 
 	function drawPixelData() {
-		card.canvasHolder.append(art.image);
-		card.canvasHolder.append(art.canvas);
+		card.artDebugInfo.append(art.image);
 
 		// Draw pixels
 		var spacing = 55;
@@ -118,25 +118,35 @@ function createArtCard(holder, art) {
 
 		var pixelCount = art.pixelData.length / 4;
 
-		console.log("expected: " + w * h * 4);
-		console.log("got: " + art.pixelData.length);
-		console.log(pixelCount);
+
 		for (var i = 0; i < pixelCount / spacing; i++) {
-			var start = i * 4*spacing;
+			var start = i * 4 * spacing;
 			start *= 1;
-			console.log(start);
 			var r = art.pixelData[start];
 			var g = art.pixelData[start + 1];
 			var b = art.pixelData[start + 2];
-		
 
-						console.log(r + " " + g + " " + b);
-			
 			$("<div/>", {
 				class: "pixelbar-swatch"
 			}).appendTo(card.pixelBar).css({
 				backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
 			});
+		}
+
+
+		for (var i = 0; i < art.calculations.length; i++) {
+			var val = art.calculations[i];
+			var c = new KColor(val*.7 + .8, 1.2 - .6 * val, .5 +  .5 * val);
+
+			$("<div/>", {
+				class: "art-calculationswatch",
+				html: val.toFixed(2)
+			}).appendTo(card.artCalculations).css({
+				
+				color: c.toCSS(-.5, 0),
+				backgroundColor: c.toCSS(.2, 0)
+			});
+
 		}
 
 		/*

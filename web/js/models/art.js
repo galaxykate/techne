@@ -1,10 +1,10 @@
-var artSize = new Vector(60, 80);
+var artSize = new Vector(90, 120);
 var artCount = 0;
 
 var Art = Class.extend({
 	init: function(artist, settings) {
 		this.id = artCount++;
-		
+
 
 		$.extend(this, settings);
 		if (settings.generator) {
@@ -13,7 +13,14 @@ var Art = Class.extend({
 
 		this.size = new Vector(artSize);
 		this.artist = artist;
-		
+
+		this.calculations = [];
+
+		this.calculations[0] = Math.random();
+		this.calculations[1] = Math.random();
+	this.calculations[2] = Math.random();
+	this.calculations[3] = Math.random();
+
 	},
 
 
@@ -27,7 +34,7 @@ var Art = Class.extend({
 
 		// Fill the canvas with pixels and get the pixel array back
 		svgToCanvas(this.svg, this.canvas, function(pixelData, imgURL) {
-		
+
 			art.pixelData = pixelData;
 			art.image = imgURL;
 			callback();
