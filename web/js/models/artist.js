@@ -17,16 +17,18 @@ var Artist = Class.extend({
 			this.grammar = tracery.createGrammar(settings.grammarGenerator.generate());
 		}
 
-
 		this.art = [];
 
 	},
+
 
 	createArt: function(count) {
 		var art = [];
 		for (var i = 0; i < count; i++) {
 			art.push(new Art(this, {
-				generator: this.grammar
+				generator: this.grammar,
+
+
 			}));
 		}
 
@@ -34,10 +36,15 @@ var Artist = Class.extend({
 		return art;
 	},
 
+	evaluateArt: function() {
+		$.each(this.art, function() {
+
+		});
+	},
+
 	toString: function() {
 		return this.name;
 	}
-
 
 
 

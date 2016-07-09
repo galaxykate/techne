@@ -9,9 +9,10 @@ var modes = {
 		onStart: function() {
 			// Create n bots
 			clearSim();
+			createPreferenceGenerators(1);
 			createGrammarGenerators(1);
-			createArtists(3);
-			createArt(8);
+			createArtists(1);
+			createArt(1);
 
 			$.each(sim.artists, function(index, artist) {
 				createArtistCard(ui.sideHolder, artist);
@@ -19,6 +20,7 @@ var modes = {
 			$.each(sim.art, function(index, art) {
 				createArtCard(ui.mainHolder, art);
 			});
+
 		},
 	},
 
@@ -64,6 +66,8 @@ function selectArt(art) {
 	ui.selectedArt = art;
 }
 
+
+
 /*
  * Create cards for individual art
  */
@@ -71,34 +75,132 @@ function createArtCard(holder, art) {
 	var card = new Card(holder, art, {
 		title: art.toString(),
 		classes: "card-art card-art" + art.id,
-				hideDetails: true,
+		hideDetails: true,
 	});
 
+	// Create the holder for the svg
 	card.art = $("<div/>", {
 		class: "art-thumbnail",
 		html: art.svg
 	}).appendTo(card.contents);
 
 
+	// TEST CANVAS
+	// Create a test canvas
+	card.canvasHolder = $("<div/>", {
+		class: "art-thumbnail",
+		html: "canvas<br>"
+	}).appendTo(card.contents);
+
+
+
+	card.pixelBar = $("<div/>", {
+		class: "pixelbar",
+	}).appendTo(card.canvasHolder);
+
+
+	// Critique
 	card.critique = $("<div/>", {
 		class: "art-critiquecolumn",
 	}).appendTo(card.contents);
 
-	// Make dots for each critique
-	var critiques = getCritsFor(art);
-	//console.log(critiques);
 
-	$.each(critiques, function(index, crit) {
-		var dot = $("<div/>", {
-			html: evalToEmoji(crit.evaluation),
-			class: "art-critdot",
-		}).appendTo(card.critique).css({
-			backgroundColor: "hsl(" + (380 + crit.evaluation * 170)%360 + ",100%," + (crit.evaluation*50 + 20)+ "%)"
-		}).click(function() {
-			selectCritic(crit.critic);
-			selectArt(crit.art);
+	function drawPixelData() {
+		card.canvasHolder.append(art.image);
+		card.canvasHolder.append(art.canvas);
+
+		// Draw pixels
+		var spacing = 55;
+		var w = art.size.x;
+		var h = art.size.y;
+		var xTiles = Math.floor(w / spacing);
+		var yTiles = Math.floor(h / spacing);
+
+		var pixelCount = art.pixelData.length / 4;
+
+		console.log("expected: " + w * h * 4);
+		console.log("got: " + art.pixelData.length);
+		console.log(pixelCount);
+		for (var i = 0; i < pixelCount / spacing; i++) {
+			var start = i * 4*spacing;
+			start *= 1;
+			console.log(start);
+			var r = art.pixelData[start];
+			var g = art.pixelData[start + 1];
+			var b = art.pixelData[start + 2];
+		
+
+						console.log(r + " " + g + " " + b);
+			
+			$("<div/>", {
+				class: "pixelbar-swatch"
+			}).appendTo(card.pixelBar).css({
+				backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
+			});
+		}
+
+		/*
+			for (var j = 0; j < yTiles; j++) {
+				for (var i = 0; i < xTiles; i++) {
+					var x = i * spacing;
+					var y = j * spacing;
+					//x = Math.floor(Math.random() * w);
+					var index = x + y * w;
+					
+					index = Math.floor(Math.random()*8000);
+					index *= 4;
+					console.log(index);
+					//console.log(x + " " + y + " " + index);
+
+					var r = art.pixelData[index];
+					var g = art.pixelData[index + 1];
+					var b = art.pixelData[index + 2];
+
+					if (i === xTiles - 1) {
+
+						console.log(r + " " + g + " " + b);
+					}
+
+					$("<div/>", {
+						class: "pixelbar-swatch"
+					}).appendTo(card.pixelBar).css({
+						backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
+					});
+				}
+			}
+			*/
+
+	}
+
+	function updateCritiqueUI() {
+		// Make dots for each critique
+		var critiques = getCritsFor(art);
+		$.each(critiques, function(index, crit) {
+			var dot = $("<div/>", {
+				html: evalToEmoji(crit.evaluation),
+				class: "art-critdot",
+			}).appendTo(card.critique).css({
+				backgroundColor: "hsl(" + (380 + crit.evaluation * 170) % 360 + ",100%," + (crit.evaluation * 50 + 20) + "%)"
+			}).click(function() {
+				selectCritic(crit.critic);
+				selectArt(crit.art);
+			});
 		});
-	});
+	}
+	// Is the pixel data set yet?
+	if (!art.pixelData) {
+		console.log("load pixel data");
+		art.renderToPixels(function() {
+			updateCritiqueUI();
+			drawPixelData();
+		});
+	} else {
+		console.log("pixel data already loaded");
+		drawPixelData();
+		updateCritiqueUI();
+	}
+
+
 
 	/*
 	 * Add details about the art
@@ -124,8 +226,8 @@ function createArtCard(holder, art) {
 function createCriticCard(holder, critic) {
 	var card = new Card(holder, critic, {
 		title: critic.toString(),
-			classes: "card-critic card-critic" + critic.id,
-	hideDetails: true,
+		classes: "card-critic card-critic" + critic.id,
+		hideDetails: true,
 	});
 
 	var hue = critic.preference.favoriteHue;
@@ -144,8 +246,8 @@ function createCriticCard(holder, critic) {
 function createArtistCard(holder, artist) {
 	var card = new Card(holder, artist, {
 		title: artist.toString(),
-				classes: "card-artist card-artist" + artist.id,
-	hideDetails: true,
+		classes: "card-artist card-artist" + artist.id,
+		hideDetails: true,
 	});
 
 	card.contents.html("");
@@ -177,6 +279,7 @@ function createArtistCard(holder, artist) {
 }
 
 function initUI() {
+
 	ui.mainHolder = $("#main-entities");
 	ui.sideHolder = $("#side-entities");
 	var select = $("#select-mode");
@@ -188,8 +291,17 @@ function initUI() {
 	select.change(function() {
 		switchMode($(this).val());
 	});
+
+	// Set the current mode to whatever the last mode was
+	var lastMode = localStorage.getItem("lastMode");
+	if (!lastMode)
+		lastMode = "module1";
+	switchMode(lastMode);
+
+
 }
 
+// Switch the mode (and save state to localstorage)
 function switchMode(mode) {
 	var modeData = modes[mode];
 	if (!modeData) {
@@ -197,12 +309,17 @@ function switchMode(mode) {
 	} else {
 		ui.mode = modeData;
 		console.log("Start: " + modeData.title);
-		$("#left-col > .section-header > .section-title").html(modeData.title);
 
+		// Set the title and clear the UI
+		$("#left-col > .section-header > .section-title").html(modeData.title);
 		$("#main-entities").html("");
 		$("#side-entities").html("");
+
+		// Custom behavior
 		modeData.onStart();
 
+		// Record as the last mode
+		localStorage.setItem("lastMode", mode);
 
 	}
 }
