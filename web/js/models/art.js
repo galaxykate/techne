@@ -2,13 +2,12 @@ var artSize = new Vector(90, 120);
 var artCount = 0;
 
 var Art = Class.extend({
-	init: function(artist, settings) {
+	init: function(artist, settings, callback) {
 		this.id = artCount++;
 		var art = this;
 
 		$.extend(this, settings);
 
-		console.log(settings);
 		this.svg = this.tree.finishedText;
 
 		this.size = new Vector(artSize);
@@ -22,23 +21,11 @@ var Art = Class.extend({
 		this.calculations[3] = Math.random();
 		this.selfrating = -1;
 
-		if (!this.pixels) {
-			this.renderToPixels(function() {
-				art.calculateHueDist();
-			});
-		} else art.calculateHueDist();
+		this.renderToPixels(callback);
 
 
 	},
 
-	onPixelData: function(callback) {
-		if (!this.pixels) {
-			this.renderToPixels(function() {
-				callback();
-			});
-		} else callback();
-
-	},
 
 
 	calculateHueDist: function() {
@@ -80,11 +67,7 @@ var Art = Class.extend({
 		}
 
 
-		var favBucket = Math.floor((this.artist.favoriteHue) * bucketCount);
-		console.log(favBucket + ": " + this.hueDist.join(","));
-		this.selfrating = this.hueDist[favBucket] * bucketCount / total;
-		console.log(this.selfrating);
-
+	
 	},
 
 	renderToPixels: function(callback) {
@@ -100,10 +83,9 @@ var Art = Class.extend({
 
 			art.pixelData = pixelData;
 			art.image = imgURL;
-			callback();
-			//console.log(pixelData);
+			art.calculateHueDist();
+	callback(art);
 		});
-
 
 
 	},

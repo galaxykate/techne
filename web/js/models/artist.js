@@ -19,26 +19,36 @@ var Artist = Class.extend({
 	},
 
 
-	createArt: function(count) {
-		var grammar = getRandom(this.artGrammars);
-		var art = [];
+	rerollGrammar: function(callback) {
+		this.artGrammars = [];
+		this.artGrammars.push(new ArtGrammar());
 
-		for (var i = 0; i < count; i++) {
-
-			art.push(new Art(this, {
-				generator: grammar,
-				tree: grammar.generate()
-			}));
-		}
-
-		this.art = this.art.concat(art);
-		return art;
+		$.each(this.art, function(art) {
+			art.isDeleted = true;
+		});
+		this.art = [];
 	},
 
-	evaluateArt: function() {
-		$.each(this.art, function() {
+	createArt: function(callback) {
+		var artist = this;
+		var grammar = getRandom(this.artGrammars);
 
+		// Create the art and callback when loaded
+		var newArt = new Art(this, {
+			generator: grammar,
+			tree: grammar.generate()
+		}, function() {
+			artist.art.push(newArt);
+			callback(newArt);
 		});
+	},
+
+	evaluateArt: function(art) {
+		var bucketCount = art.hueDist.length;
+		var favBucket = Math.floor((this.favoriteHue) * bucketCount);
+		rating = art.hueDist[favBucket] * bucketCount;
+		return rating;
+
 	},
 
 	toString: function() {

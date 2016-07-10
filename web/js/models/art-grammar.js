@@ -1,5 +1,6 @@
 // Create an art grammar that can generate images
 
+var grammarCount = 0;
 var shapes = [toClosedTag("rect", {
 	x: "#digit##digit#",
 	y: "#digit##digit#",
@@ -10,6 +11,7 @@ var shapes = [toClosedTag("rect", {
 var ArtGrammar = Class.extend({
 
 	init: function() {
+		this.id = grammarCount++;
 		this.size = new Vector(artSize);
 
 		var w = this.size.x;
@@ -47,7 +49,7 @@ var ArtGrammar = Class.extend({
 		}
 
 		raw.shape = shapes;
-		console.log(raw);
+		//console.log(raw);
 		this.grammar = tracery.createGrammar(raw);
 	},
 	generate: function() {

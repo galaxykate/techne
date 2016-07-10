@@ -11,15 +11,20 @@ var modes = {
 			clearSim();
 			createPreferenceGenerators(1);
 			createArtists(1);
-			createArt(20);
+			createArt(20, function(createdArt) {
+
+				$.each(sim.artists, function(index, artist) {
+					createArtistCard(ui.sideHolder, artist);
+				});
+				$.each(sim.art, function(index, art) {
+					createArtCard(ui.mainHolder, art);
+				});
+
+				var artist = sim.artists[0];
+				sortAndDisplayOwnFavorites(artist);
+			});
 
 
-			$.each(sim.artists, function(index, artist) {
-				createArtistCard(ui.sideHolder, artist);
-			});
-			$.each(sim.art, function(index, art) {
-				createArtCard(ui.mainHolder, art);
-			});
 
 		},
 	},
@@ -34,26 +39,88 @@ var modes = {
 			createCritics(8);
 
 			createArtists(3);
-			createArt(8);
+			createArt(8, function() {
+				critiqueAll();
 
-			critiqueAll();
-
-			$.each(sim.critics, function(index, critic) {
-				createCriticCard(ui.sideHolder, critic);
-			});
-			$.each(sim.art, function(index, art) {
-				art.renderToPixels(function() {
-					createArtCard(ui.mainHolder, art);
+				$.each(sim.critics, function(index, critic) {
+					createCriticCard(ui.sideHolder, critic);
 				});
+				$.each(sim.art, function(index, art) {
+					art.renderToPixels(function() {
+						createArtCard(ui.mainHolder, art);
+					});
 
+				});
 			});
+
+
 		},
 	}
 };
 
+
+
 /*
  * User selections and highlights
  */
+function sortAndDisplayOwnFavorites(artist) {
+	return sortAndDisplayArtistFavorites(artist, artist.art, artist.card.contents);
+}
+
+function sortAndDisplayArtistFavorites(artist, allArt, holder, graph) {
+	holder.html("");
+
+
+	// Clone the art
+	var ratedArt = allArt.map(function(art) {
+		return {
+			art: art,
+			rating: artist.evaluateArt(art)
+		};
+	});
+
+
+
+	ratedArt.sort(function(a, b) {
+		return b.rating - a.rating;
+	});
+
+	var total = 0;
+	var stats = $("<div/>", {
+		class: "stats",
+	}).appendTo(holder);
+
+	ratedArt.map(function(rated) {
+		var rating = rated.rating;
+		total += rating;
+
+		var art = rated.art;
+
+		var mini = $("<div/>", {
+			class: "art-minithumbnail",
+		}).appendTo(holder);
+
+		var thumb = art.image.clone().css({
+			width: art.size.x * .7,
+			height: art.size.y * .7
+		}).appendTo(mini);
+
+		var miniRating = $("<div/>", {
+			class: "art-minirating rating-chip",
+			html: "&#9829;" + rating.toFixed(2)
+		}).appendTo(mini);
+
+if (graph)
+		createGraph(mini, art.hueDist);
+
+	});
+
+	var avg = total / ratedArt.length;
+	stats.html(avg.toFixed(2) + " avg score");
+	return {
+		avg: avg
+	};
+}
 
 function selectCritic(critic) {
 	console.log("select critic");
@@ -85,13 +152,15 @@ function createArtCard(holder, art) {
 		class: "art-thumbnail",
 		html: art.svg
 	}).appendTo(card.contents);
+
 	card.title.click(function() {
-			openDetails();
-		})
-		// Critique
+		openDetails();
+	});
+
+	// Critique
 	card.critique = $("<div/>", {
 		class: "art-critiquecolumn rating-chip",
-	}).appendTo(card.contents);
+	}).appendTo(card.contents).hide();
 
 
 	function closeDetails() {
@@ -237,39 +306,32 @@ function createArtistCard(holder, artist) {
 		title: artist.toString(),
 		classes: "card-artist card-artist" + artist.id,
 		hideDetails: true,
+		useControls: true
 	});
+	artist.card = card;
 
 	card.contents.html("");
 
 
-	card.art = artist.art.map(function(art) {
-
-
-		art.onPixelData(function() {
-			var mini = $("<div/>", {
-				class: "art-minithumbnail",
-			}).appendTo(card.contents);
-
-			var thumb = art.image.clone().css({
-				width: art.size.x * .7,
-				height: art.size.y * .7
-			}).appendTo(mini);
-			var miniRating = $("<div/>", {
-				class: "art-minirating rating-chip",
-				html: "&#9829;" + art.selfrating.toFixed(2)
-			}).appendTo(mini);
-
-			createGraph(mini, art.hueDist);
-		})
-	});
 
 	// Favorite color swatch
 	card.favColor = $("<div/>", {
 		html: "",
 		class: "colorswatch"
-	}).appendTo(card.title).css({
-		backgroundColor: toCSSHSLA(artist.favoriteHue, 1, .5, 1)
+	}).appendTo(card.title).click(function() {
+		artist.favoriteHue = Math.random();
+		setSwatchColor();
+		sortAndDisplayOwnFavorites(artist);
+
 	});
+
+	function setSwatchColor() {
+		card.favColor.css({
+			backgroundColor: toCSSHSLA(artist.favoriteHue, 1, .5, 1)
+		});
+	}
+	setSwatchColor();
+
 	console.log(toCSSHSLA(artist.favoriteHue, 1, 1, 1));
 	// controls ↻
 	card.addArt = $("<button/>", {
@@ -277,7 +339,41 @@ function createArtistCard(holder, artist) {
 	}).appendTo(card.customControls);
 	card.refreshArt = $("<button/>", {
 		html: "↻"
-	}).appendTo(card.customControls);
+	}).appendTo(card.customControls).click(function() {
+		// reroll grammar
+
+var artCount = 20;
+		var count = 0;
+		var bestGrammar = artist.grammar;
+		var bestScore = 0;
+
+		var interval = setInterval(function() {
+			artist.rerollGrammar();
+			createArt(artCount, function() {
+
+				var stats = sortAndDisplayOwnFavorites(artist);
+				console.log(count+  ": " + stats.avg)
+				if (stats.avg > bestScore) {
+					bestGrammar = artist.artGrammars[0];
+					bestScore = stats.avg;
+					console.log("NEW BEST " + count + ": " + stats.avg)
+				}
+				count++;
+			});
+
+			if (count > 40) {
+				clearInterval(interval);
+				artist.artGrammars[0] = bestGrammar;
+				createArt(artCount, function() {
+					var stats = sortAndDisplayOwnFavorites(artist);
+				});
+
+console.log("BEST: " + artist.artGrammars[0].id + " " + bestScore);
+			}
+		}, 200);
+
+
+	});
 
 
 	card.artistInfo = $("<div/>", {
@@ -392,7 +488,7 @@ function createGraph(holder, buckets) {
 		max = Math.max(buckets[i], max);
 	}
 
-max = 2;
+	max = 2;
 
 	$.each(buckets, function(index, bucket) {
 		var pct = index / buckets.length;
@@ -405,7 +501,7 @@ max = 2;
 		var barFill = $("<div/>", {
 			class: "graph-barfill"
 		}).appendTo(barHolder).css({
-			height: (bucket * 100/max) + "%",
+			height: (bucket * 100 / max) + "%",
 			backgroundColor: toCSSHSLA(pct, 1, .6, 1)
 		});
 

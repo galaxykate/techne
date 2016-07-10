@@ -1,16 +1,19 @@
-
+body {
+	 background-image: url("img/retina_wood.png");
+   
+}
 
 html, body {
     margin: 0;
     padding: 0;
     border: 0;
-     height: 100%;
-     font-family: "Trebuchet MS", Helvetica, sans-serif;
+    height: 100%;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+
 }
 
 #main {
 	position: relative;
-	background-color:hsl(290, 90%, 20%);
 	width: 100%;
 	height: 100%;
 }
@@ -29,8 +32,7 @@ html, body {
 	min-height: 20px;
 	display: inline-flex;
 	flex-direction: row;
-
-	background-color:hsla(290, 90%, 90%, .2);
+box-shadow: 0px 1px 3px rgba(30, 0, 0, .5);
 	
 }
 
@@ -64,7 +66,6 @@ html, body {
 	position: relative;
 	flex: 1 1;
 	padding: 3px;
-	background-color:hsla(290, 90%, 10%, .2);
 		display: inline-flex;
 		overflow-y: scroll;
 		overflow-x: hidden;
@@ -75,7 +76,8 @@ html, body {
 	max-width: 900px;
 	position: relative;
 	margin: 0px auto;
-	background-color:hsla(290, 90%, 90%, .2);
+	background-color:hsla(20, 10%, 96%, 1);
+	box-shadow: 0px 2px 6px rgba(0, 0, 0, .4);
 	height: 100%;
 
 	display: inline-flex;
@@ -87,10 +89,10 @@ html, body {
 }
 
 #left-col {
-		max-width: 220px;
-background-color:hsla(90, 90%, 60%, .9);
+		max-width: 250px;
+
 }
 
 #right-col {
-	background-color:hsla(190, 90%, 60%, .9);
+	
 }
