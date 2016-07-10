@@ -4,7 +4,7 @@ var sim = {
 	critics: [],
 	critiques: [],
 	preferenceGenerators: [],
-	grammarGenerators: [],
+	
 };
 
 
@@ -14,16 +14,10 @@ function clearSim() {
 	sim.critics = [];
 	sim.critiques = [];
 	sim.preferenceGenerators = [];
-	sim.grammarGenerators = [];
+	
 }
 
 // Create artist generators (schools)
-function createGrammarGenerators(count) {
-	for (var i = 0; i < count; i++) {
-
-		sim.grammarGenerators.push(new GrammarGenerator());
-	}
-}
 
 function createPreferenceGenerators(count) {
 	for (var i = 0; i < count; i++) {
@@ -48,10 +42,8 @@ function createCritics(count) {
 function createArtists(count) {
 	for (var i = 0; i < count; i++) {
 
-		var generator = getRandom(sim.grammarGenerators);
 		var preferenceGenerator = getRandom(sim.preferenceGenerators);
 		sim.artists.push(new Artist({
-			grammarGenerator: generator,
 			preferenceGenerator: preferenceGenerator
 		}));
 	}

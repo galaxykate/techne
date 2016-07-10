@@ -10,9 +10,9 @@ var modes = {
 			// Create n bots
 			clearSim();
 			createPreferenceGenerators(1);
-			createGrammarGenerators(1);
 			createArtists(1);
-			createArt(1);
+			createArt(20);
+
 
 			$.each(sim.artists, function(index, artist) {
 				createArtistCard(ui.sideHolder, artist);
@@ -30,7 +30,6 @@ var modes = {
 			// Create n bots
 			clearSim();
 			createPreferenceGenerators(1);
-			createGrammarGenerators(1);
 
 			createCritics(8);
 
@@ -43,7 +42,10 @@ var modes = {
 				createCriticCard(ui.sideHolder, critic);
 			});
 			$.each(sim.art, function(index, art) {
-				createArtCard(ui.mainHolder, art);
+				art.renderToPixels(function() {
+					createArtCard(ui.mainHolder, art);
+				});
+
 			});
 		},
 	}
@@ -83,150 +85,127 @@ function createArtCard(holder, art) {
 		class: "art-thumbnail",
 		html: art.svg
 	}).appendTo(card.contents);
-
-
-	// View test information on this art
-	card.artDebugInfo = $("<div/>", {
-		class: "art-thumbnail",
-		html: "img<br>"
-	}).appendTo(card.contents);
-
-	card.pixelBar = $("<div/>", {
-		class: "pixelbar",
-	}).appendTo(card.artDebugInfo);
-
-	card.artCalculations = $("<div/>", {
-		class: "art-calculations",
-	}).appendTo(card.artDebugInfo);
-
-
-	// Critique
+	card.title.click(function() {
+			openDetails();
+		})
+		// Critique
 	card.critique = $("<div/>", {
-		class: "art-critiquecolumn",
+		class: "art-critiquecolumn rating-chip",
 	}).appendTo(card.contents);
 
 
-	function drawPixelData() {
-		card.artDebugInfo.append(art.image);
+	function closeDetails() {
+		card.artDebugInfo.remove();
+		card.pixelBar.remove();
+		card.artCalculations.remove();
+		card.treeView.remove();
 
-		// Draw pixels
-		var spacing = 55;
-		var w = art.size.x;
-		var h = art.size.y;
-		var xTiles = Math.floor(w / spacing);
-		var yTiles = Math.floor(h / spacing);
+	}
 
-		var pixelCount = art.pixelData.length / 4;
+	function openDetails() {
+		// View test information on this art
+		card.artDebugInfo = $("<div/>", {
+			class: "art-thumbnail art-thumbnail-large",
+		}).appendTo(card.contents);
 
+		card.pixelBar = $("<div/>", {
+			class: "pixelbar",
+		}).appendTo(card.artDebugInfo);
 
-		for (var i = 0; i < pixelCount / spacing; i++) {
-			var start = i * 4 * spacing;
-			start *= 1;
-			var r = art.pixelData[start];
-			var g = art.pixelData[start + 1];
-			var b = art.pixelData[start + 2];
+		card.artCalculations = $("<div/>", {
+			class: "art-calculations",
+		}).appendTo(card.artDebugInfo);
 
-			$("<div/>", {
-				class: "pixelbar-swatch"
-			}).appendTo(card.pixelBar).css({
-				backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
-			});
-		}
+		// Critique
+		card.treeView = $("<div/>", {
+			class: "art-treeholder",
+		}).appendTo(card.contents);
 
+		var node = new UINode(art.tree, card.treeView);
 
-		for (var i = 0; i < art.calculations.length; i++) {
-			var val = art.calculations[i];
-			var c = new KColor(val*.7 + .8, 1.2 - .6 * val, .5 +  .5 * val);
-
-			$("<div/>", {
-				class: "art-calculationswatch",
-				html: val.toFixed(2)
-			}).appendTo(card.artCalculations).css({
-				
-				color: c.toCSS(-.5, 0),
-				backgroundColor: c.toCSS(.2, 0)
+		function drawPixelData() {
+			card.artDebugInfo.append(art.image);
+			art.image.css({
+				width: art.size.x * 2,
+				height: art.size.y * 2
 			});
 
-		}
+			// Draw pixels
+			var spacing = 55;
+			var w = art.size.x;
+			var h = art.size.y;
+			var xTiles = Math.floor(w / spacing);
+			var yTiles = Math.floor(h / spacing);
 
-		/*
-			for (var j = 0; j < yTiles; j++) {
-				for (var i = 0; i < xTiles; i++) {
-					var x = i * spacing;
-					var y = j * spacing;
-					//x = Math.floor(Math.random() * w);
-					var index = x + y * w;
-					
-					index = Math.floor(Math.random()*8000);
-					index *= 4;
-					console.log(index);
-					//console.log(x + " " + y + " " + index);
+			var pixelCount = art.pixelData.length / 4;
 
-					var r = art.pixelData[index];
-					var g = art.pixelData[index + 1];
-					var b = art.pixelData[index + 2];
 
-					if (i === xTiles - 1) {
+			for (var i = 0; i < pixelCount / spacing; i++) {
+				var start = i * 4 * spacing;
+				start *= 1;
+				var r = art.pixelData[start];
+				var g = art.pixelData[start + 1];
+				var b = art.pixelData[start + 2];
 
-						console.log(r + " " + g + " " + b);
-					}
-
-					$("<div/>", {
-						class: "pixelbar-swatch"
-					}).appendTo(card.pixelBar).css({
-						backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
-					});
-				}
+				$("<div/>", {
+					class: "pixelbar-swatch"
+				}).appendTo(card.pixelBar).css({
+					backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
+				});
 			}
-			*/
 
-	}
 
-	function updateCritiqueUI() {
-		// Make dots for each critique
-		var critiques = getCritsFor(art);
-		$.each(critiques, function(index, crit) {
-			var dot = $("<div/>", {
-				html: evalToEmoji(crit.evaluation),
-				class: "art-critdot",
-			}).appendTo(card.critique).css({
-				backgroundColor: "hsl(" + (380 + crit.evaluation * 170) % 360 + ",100%," + (crit.evaluation * 50 + 20) + "%)"
-			}).click(function() {
-				selectCritic(crit.critic);
-				selectArt(crit.art);
+			for (var i = 0; i < art.calculations.length; i++) {
+				var val = art.calculations[i];
+				var c = new KColor(val * .7 + .8, 1.2 - .6 * val, .5 + .5 * val);
+
+				$("<div/>", {
+					class: "art-calculationswatch",
+					html: val.toFixed(2)
+				}).appendTo(card.artCalculations).css({
+
+					color: c.toCSS(-.5, 0),
+					backgroundColor: c.toCSS(.2, 0)
+				});
+
+			}
+
+
+
+		}
+
+		function updateCritiqueUI() {
+			// Make dots for each critique
+			var critiques = getCritsFor(art);
+			$.each(critiques, function(index, crit) {
+				var dot = $("<div/>", {
+					html: evalToEmoji(crit.evaluation),
+					class: "art-critdot",
+				}).appendTo(card.critique).css({
+					backgroundColor: "hsl(" + (380 + crit.evaluation * 170) % 360 + ",100%," + (crit.evaluation * 50 + 20) + "%)"
+				}).click(function() {
+					selectCritic(crit.critic);
+					selectArt(crit.art);
+				});
 			});
-		});
-	}
-	// Is the pixel data set yet?
-	if (!art.pixelData) {
-		console.log("load pixel data");
-		art.renderToPixels(function() {
-			updateCritiqueUI();
+		}
+		// Is the pixel data set yet?
+		if (!art.pixelData) {
+			console.log("load pixel data");
+			art.renderToPixels(function() {
+				updateCritiqueUI();
+				drawPixelData();
+			});
+		} else {
+			console.log("pixel data already loaded");
 			drawPixelData();
-		});
-	} else {
-		console.log("pixel data already loaded");
-		drawPixelData();
-		updateCritiqueUI();
+			updateCritiqueUI();
+		}
+
+
 	}
 
 
-
-	/*
-	 * Add details about the art
-	 */
-	card.artistInfo = $("<div/>", {
-		class: "card-info",
-		html: art.artist.toString()
-	}).appendTo(card.details);
-
-	card.codeHolder = $("<div/>", {
-		class: "art-code",
-	}).appendTo(card.details);
-
-	card.code = $("<code/>", {
-		text: art.svg
-	}).appendTo(card.codeHolder);
 
 	//card.contents.html("foo");
 	ui.cards.push(card);
@@ -261,15 +240,37 @@ function createArtistCard(holder, artist) {
 	});
 
 	card.contents.html("");
+
+
 	card.art = artist.art.map(function(art) {
-		$("<div/>", {
-			class: "art-minithumbnail",
-			html: art.svg
-		}).appendTo(card.contents);
+
+
+		art.onPixelData(function() {
+			var mini = $("<div/>", {
+				class: "art-minithumbnail",
+			}).appendTo(card.contents);
+
+			var thumb = art.image.clone().css({
+				width: art.size.x * .7,
+				height: art.size.y * .7
+			}).appendTo(mini);
+			var miniRating = $("<div/>", {
+				class: "art-minirating rating-chip",
+				html: "&#9829;" + art.selfrating.toFixed(2)
+			}).appendTo(mini);
+
+			createGraph(mini, art.hueDist);
+		})
 	});
 
-
-
+	// Favorite color swatch
+	card.favColor = $("<div/>", {
+		html: "",
+		class: "colorswatch"
+	}).appendTo(card.title).css({
+		backgroundColor: toCSSHSLA(artist.favoriteHue, 1, .5, 1)
+	});
+	console.log(toCSSHSLA(artist.favoriteHue, 1, 1, 1));
 	// controls ↻
 	card.addArt = $("<button/>", {
 		html: "+"
@@ -380,6 +381,36 @@ var formatCode = function(code, stripWhiteSpaces, stripEmptyLines) {
 	return result;
 };
 
+
+function createGraph(holder, buckets) {
+	var graph = $("<div/>", {
+		class: "graph"
+	}).appendTo(holder);
+
+	var max = -99999;
+	for (var i = 0; i < buckets.length; i++) {
+		max = Math.max(buckets[i], max);
+	}
+
+max = 2;
+
+	$.each(buckets, function(index, bucket) {
+		var pct = index / buckets.length;
+		var barHolder = $("<div/>", {
+			class: "graph-barholder"
+		}).appendTo(graph).css({
+			backgroundColor: toCSSHSLA(pct, .3, .2, 1)
+		});
+
+		var barFill = $("<div/>", {
+			class: "graph-barfill"
+		}).appendTo(barHolder).css({
+			height: (bucket * 100/max) + "%",
+			backgroundColor: toCSSHSLA(pct, 1, .6, 1)
+		});
+
+	});
+}
 
 function evalToEmoji(ev) {
 

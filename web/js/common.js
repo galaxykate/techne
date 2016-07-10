@@ -7,133 +7,134 @@
  */
 
 function extend(destination, source) {
-    for (var k in source) {
-        if (source.hasOwnProperty(k)) {
-            destination[k] = source[k];
-        }
-    }
-    return destination;
+	for (var k in source) {
+		if (source.hasOwnProperty(k)) {
+			destination[k] = source[k];
+		}
+	}
+	return destination;
 }
 
 // Inspired by base2 and Prototype
 (function() {
-    var initializing = false, fnTest = /xyz/.test(function() { xyz;
-    }) ? /\b_super\b/ : /.*/;
+	var initializing = false,
+		fnTest = /xyz/.test(function() {
+			xyz;
+		}) ? /\b_super\b/ : /.*/;
 
-    // The base Class implementation (does nothing)
-    this.Class = function() {
-    };
+	// The base Class implementation (does nothing)
+	this.Class = function() {};
 
-    // Create a new Class that inherits from this class
-    Class.extend = function(prop) {
-        var _super = this.prototype;
+	// Create a new Class that inherits from this class
+	Class.extend = function(prop) {
+		var _super = this.prototype;
 
-        // Instantiate a base class (but only create the instance,
-        // don't run the init constructor)
-        initializing = true;
-        var prototype = new this();
-        initializing = false;
+		// Instantiate a base class (but only create the instance,
+		// don't run the init constructor)
+		initializing = true;
+		var prototype = new this();
+		initializing = false;
 
-        // Copy the properties over onto the new prototype
-        for (var name in prop) {
-            // Check if we're overwriting an existing function
-            prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn) {
-                return function() {
-                    var tmp = this._super;
+		// Copy the properties over onto the new prototype
+		for (var name in prop) {
+			// Check if we're overwriting an existing function
+			prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn) {
+				return function() {
+					var tmp = this._super;
 
-                    // Add a new ._super() method that is the same method
-                    // but on the super-class
-                    this._super = _super[name];
+					// Add a new ._super() method that is the same method
+					// but on the super-class
+					this._super = _super[name];
 
-                    // The method only need to be bound temporarily, so we
-                    // remove it when we're done executing
-                    var ret = fn.apply(this, arguments);
-                    this._super = tmp;
+					// The method only need to be bound temporarily, so we
+					// remove it when we're done executing
+					var ret = fn.apply(this, arguments);
+					this._super = tmp;
 
-                    return ret;
-                };
-            })(name, prop[name]) : prop[name];
-        }
+					return ret;
+				};
+			})(name, prop[name]) : prop[name];
+		}
 
-        // The dummy class constructor
-        function Class() {
-            // All construction is actually done in the init method
-            if (!initializing && this.init)
-                this.init.apply(this, arguments);
-        }
+		// The dummy class constructor
+		function Class() {
+			// All construction is actually done in the init method
+			if (!initializing && this.init)
+				this.init.apply(this, arguments);
+		}
 
-        // Populate our constructed prototype object
-        Class.prototype = prototype;
+		// Populate our constructed prototype object
+		Class.prototype = prototype;
 
-        // Enforce the constructor to be what we expect
-        Class.prototype.constructor = Class;
+		// Enforce the constructor to be what we expect
+		Class.prototype.constructor = Class;
 
-        // And make this class extendable
-        Class.extend = arguments.callee;
+		// And make this class extendable
+		Class.extend = arguments.callee;
 
-        return Class;
-    };
+		return Class;
+	};
 })();
 
 var utilities = {
 
-	noiseObj : new SimplexNoise(Math.random),
+	noiseObj: new SimplexNoise(Math.random),
 
-	noise : function() {
+	noise: function() {
 		// use the correct number of args
-		switch(arguments.length) {
-		case 1:
-			return utilities.noiseObj.noise2D(arguments[0], 1000);
-			break;
-		case 2:
-			return utilities.noiseObj.noise2D(arguments[0], arguments[1]);
-			break;
-		case 3:
-			return utilities.noiseObj.noise3D(arguments[0], arguments[1], arguments[2]);
-			break;
-		case 4:
-			return utilities.noiseObj.noise4D(arguments[0], arguments[1], arguments[2], arguments[3]);
-			break;
-		default:
-			console.log("Attempting to use Noise with " + arguments.length + " arguments: not supported!");
-			return 0;
-			break;
+		switch (arguments.length) {
+			case 1:
+				return utilities.noiseObj.noise2D(arguments[0], 1000);
+				break;
+			case 2:
+				return utilities.noiseObj.noise2D(arguments[0], arguments[1]);
+				break;
+			case 3:
+				return utilities.noiseObj.noise3D(arguments[0], arguments[1], arguments[2]);
+				break;
+			case 4:
+				return utilities.noiseObj.noise4D(arguments[0], arguments[1], arguments[2], arguments[3]);
+				break;
+			default:
+				console.log("Attempting to use Noise with " + arguments.length + " arguments: not supported!");
+				return 0;
+				break;
 		}
 	},
 
-	seedNoise : function(rnd) {
+	seedNoise: function(rnd) {
 		utilities.noiseObj = new _Noise(rnd);
 	},
 
 	// convert angle to -PI, PI
-	normalizeAngle : function(angle) {
+	normalizeAngle: function(angle) {
 		angle = angle % (Math.PI * 2);
 		if (angle > Math.PI)
 			angle -= Math.PI * 2;
 		return angle;
 	},
 	// put noise in here too?
-	capitaliseFirstLetter : function(string) {
+	capitaliseFirstLetter: function(string) {
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
-	lowerCaseFirstLetter : function(string) {
+	lowerCaseFirstLetter: function(string) {
 		return string.charAt(0).toLowerCase() + string.slice(1);
 	},
 
-	words : {
-		syllables : {
-			first : "B C D F G H J K L M N P Qu R S T V W X Y Z St Fl Bl Pr Kr Ll Chr Sk Br Sth Ch Dhr Dr Sl Sc Sh Thl Thr Pl Fr Phr Phl Wh".split(" "),
-			middle : "an all ar art air aean eun eun euh esqu aphn arl ifn ast ign agn af av ant app ab er en eor eon ent enth iar ein irt ian ion iont ill il ipp in is it ik ob ov orb oon ion uk uf un ull urk".split(" "),
-			composites : "estr antr okl ackl".split(" "),
-			last : "a ia ea u y en am is on an o ang ing io i el ios ius ae ie ee i".split(" "),
+	words: {
+		syllables: {
+			first: "B C D F G H J K L M N P Qu R S T V W X Y Z St Fl Bl Pr Kr Ll Chr Sk Br Sth Ch Dhr Dr Sl Sc Sh Thl Thr Pl Fr Phr Phl Wh".split(" "),
+			middle: "an all ar art air aean eun eun euh esqu aphn arl ifn ast ign agn af av ant app ab er en eor eon ent enth iar ein irt ian ion iont ill il ipp in is it ik ob ov orb oon ion uk uf un ull urk".split(" "),
+			composites: "estr antr okl ackl".split(" "),
+			last: "a ia ea u y en am is on an o ang ing io i el ios ius ae ie ee i".split(" "),
 		},
-		animals : "cobra okapi moose amoeba mongoose capybara yeti dragon unicorn sphinx kangaroo boa nematode sheep quail goat corgi agouti zebra giraffe rhino skunk dolphin whale bullfrog okapi sloth monkey orangutan grizzly moose elk dikdik ibis stork finch nightingale goose robin eagle hawk iguana tortoise panther lion tiger gnu reindeer raccoon opossum".split(" "),
-		moods : "vexed indignant impassioned wistful astute courteous benevolent convivial mirthful lighthearted affectionate mournful inquisitive quizzical studious disillusioned angry bemused oblivious sophisticated elated skeptical morose gleeful curious sleepy hopeful ashamed alert energetic exhausted giddy grateful groggy grumpy irate jealous jubilant lethargic sated lonely relaxed restless surprised tired thankful".split(" "),
-		colors : "ivory silver ecru scarlet red burgundy ruby crimson carnelian pink rose grey pewter charcoal slate onyx black mahogany brown green emerald blue sapphire turquoise aquamarine teal gold yellow carnation orange lavender purple magenta lilac ebony amethyst jade garnet".split(" "),
-		material : "fire water cybernetic steampunk jazz steel bronze brass leather pearl cloud sky river great crystal rainbow iron gold silver titanium".split(" "),
-		adventures : "lament story epic tears wish desire dance mystery enigma drama path training sorrows joy tragedy comedy riddle puzzle regret victory loss song adventure question quest vow oath tale travels".split(" "),
-		getRandomBotName : function() {
+		animals: "cobra okapi moose amoeba mongoose capybara yeti dragon unicorn sphinx kangaroo boa nematode sheep quail goat corgi agouti zebra giraffe rhino skunk dolphin whale bullfrog okapi sloth monkey orangutan grizzly moose elk dikdik ibis stork finch nightingale goose robin eagle hawk iguana tortoise panther lion tiger gnu reindeer raccoon opossum".split(" "),
+		moods: "vexed indignant impassioned wistful astute courteous benevolent convivial mirthful lighthearted affectionate mournful inquisitive quizzical studious disillusioned angry bemused oblivious sophisticated elated skeptical morose gleeful curious sleepy hopeful ashamed alert energetic exhausted giddy grateful groggy grumpy irate jealous jubilant lethargic sated lonely relaxed restless surprised tired thankful".split(" "),
+		colors: "ivory silver ecru scarlet red burgundy ruby crimson carnelian pink rose grey pewter charcoal slate onyx black mahogany brown green emerald blue sapphire turquoise aquamarine teal gold yellow carnation orange lavender purple magenta lilac ebony amethyst jade garnet".split(" "),
+		material: "fire water cybernetic steampunk jazz steel bronze brass leather pearl cloud sky river great crystal rainbow iron gold silver titanium".split(" "),
+		adventures: "lament story epic tears wish desire dance mystery enigma drama path training sorrows joy tragedy comedy riddle puzzle regret victory loss song adventure question quest vow oath tale travels".split(" "),
+		getRandomBotName: function() {
 			var adj = randomCap(utilities.words.moods);
 			if (Math.random() > .8)
 				adj = randomCap(utilities.words.material);
@@ -143,7 +144,7 @@ var utilities = {
 			return adj + " " + randomCap(utilities.words.animals);
 		},
 
-		getUserName : function() {
+		getUserName: function() {
 			var f = utilities.getRandom(utilities.words.moods);
 			if (Math.random() > .5)
 				f = utilities.getRandom(utilities.words.colors);
@@ -154,18 +155,18 @@ var utilities = {
 			return f;
 		},
 
-		getStatement : function() {
+		getStatement: function() {
 			return "This " + utilities.getRandom(utilities.words.moods) + " " + utilities.getRandom(utilities.words.adventures) + " made me " + utilities.getRandom(utilities.words.moods);
 		},
 
-		getRandomTitle : function() {
+		getRandomTitle: function() {
 			var adj = randomCap(this.moods);
 			if (Math.random() > .5)
 				adj = randomCap(this.colors);
 			return "The " + randomCap(this.adventures) + " of the " + adj + " " + randomCap(this.animals);
 		},
 
-		getRandomWord : function(lengthMult) {
+		getRandomWord: function(lengthMult) {
 			if (!lengthMult)
 				lengthMult = 1;
 			var s = utilities.getRandom(this.syllables.first);
@@ -193,12 +194,12 @@ var utilities = {
 			return s;
 		},
 
-		getDollName : function() {
+		getDollName: function() {
 			return utilities.capitaliseFirstLetter(utilities.words.getRandomWord());
 		}
 	},
 
-	arrayToString : function(array) {
+	arrayToString: function(array) {
 		s = "";
 		$.each(array, function(index, obj) {
 			if (index !== 0)
@@ -207,10 +208,10 @@ var utilities = {
 		});
 		return s;
 	},
-	inSquareBrackets : function(s) {
+	inSquareBrackets: function(s) {
 		return "[" + s + "]";
 	},
-	getSpacer : function(count) {
+	getSpacer: function(count) {
 		var s = "";
 		for (var i = 0; i < count; i++) {
 			s += " ";
@@ -218,11 +219,11 @@ var utilities = {
 		return s;
 	},
 
-	sigmoid : function(v) {
+	sigmoid: function(v) {
 		return 1 / (1 + Math.pow(Math.E, -v));
 	},
 
-	sCurve : function(v, iterations) {
+	sCurve: function(v, iterations) {
 		if (iterations === undefined)
 			iterations = 1;
 		for (var i = 0; i < iterations; i++) {
@@ -232,13 +233,13 @@ var utilities = {
 		return v;
 	},
 
-	within : function(val, min, max) {
+	within: function(val, min, max) {
 		return (val >= min) && (val <= max);
 	},
 
 	// Inefficient, fix someday
 	// the weight is determined by the function getWeight(index, item, list)
-	getWeightedRandomIndex : function(array) {
+	getWeightedRandomIndex: function(array) {
 		var totalWeight = 0;
 		var length = array.length;
 
@@ -262,42 +263,42 @@ var utilities = {
 	},
 
 	// Get a random, from an array
-	getRandom : function(array, power) {
+	getRandom: function(array, power) {
 		if (power)
 			return array[Math.floor(Math.pow(Math.random(), power) * array.length)];
 		else
 			return array[Math.floor(Math.random() * array.length)];
 	},
-	getRandomIndex : function(array) {
+	getRandomIndex: function(array) {
 		return Math.floor(Math.random() * Math.round(array.length - 1));
 	},
-	getRandomKey : function(obj) {
+	getRandomKey: function(obj) {
 		return this.getRandom(Object.keys(obj));
 	},
 
-	constrain : function(val, lowerBound, upperBound) {
+	constrain: function(val, lowerBound, upperBound) {
 		if (Math.max(val, upperBound) === val)
 			return upperBound;
 		if (Math.min(val, lowerBound) === val)
 			return lowerBound;
 		return val;
 	},
-	lerp : function(start, end, percent) {
+	lerp: function(start, end, percent) {
 		return (start + percent * (end - start));
 	},
-	lerpAngles : function(start, end, pct) {
+	lerpAngles: function(start, end, pct) {
 		var dTheta = end - start;
 	},
 
 	// angle between 0 and 2 PI
-	normalizeAngle : function(theta) {
+	normalizeAngle: function(theta) {
 		var twopi = Math.PI * 2;
 		theta = (((theta % twopi) + twopi) % twopi);
 		return theta;
 	},
 
 	// Rertun a random, possible between two numbers
-	random : function() {
+	random: function() {
 		if (arguments.length === 0)
 			return Math.random();
 		if (arguments.length === 1)
@@ -307,7 +308,7 @@ var utilities = {
 
 		return Math.random();
 	},
-	roundNumber : function(num, places) {
+	roundNumber: function(num, places) {
 		// default 2 decimal places
 		if (places === undefined) {
 			return parseFloat(Math.round(num * 100) / 100).toFixed(2);
@@ -315,7 +316,7 @@ var utilities = {
 			return parseFloat(Math.round(num * 100) / 100).toFixed(places);
 		}
 	},
-	angleBetween : function(a, b) {
+	angleBetween: function(a, b) {
 		var dTheta = b - a;
 		dTheta = ((dTheta % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 		if (dTheta > Math.PI)
@@ -323,14 +324,14 @@ var utilities = {
 		return dTheta;
 	},
 
-	addSlider : function(parent, overrideOptions, onChange) {
+	addSlider: function(parent, overrideOptions, onChange) {
 
 		var options = {
-			range : "min",
-			value : 50,
-			min : 0,
-			max : 100,
-			step : 1,
+			range: "min",
+			value: 50,
+			min: 0,
+			max: 100,
+			step: 1,
 
 		};
 		$.extend(options, overrideOptions);
@@ -344,17 +345,16 @@ var utilities = {
 		};
 
 		// Create an empty slider div
-		var optionDiv = $("<div/>", {
-		});
+		var optionDiv = $("<div/>", {});
 		optionDiv.css({
-			"pointer-events" : "auto"
+			"pointer-events": "auto"
 		});
 		parent.append(optionDiv);
 
 		var slider = $('<div />', {
-			id : 'slider_' + options.key,
-			class : "tuning_slider",
-			value : options.key
+			id: 'slider_' + options.key,
+			class: "tuning_slider",
+			value: options.key
 		});
 
 		slider.appendTo(optionDiv);
@@ -362,23 +362,23 @@ var utilities = {
 
 		// Create a lable
 		$('<label />', {
-			'for' : 'slider_' + options.key,
-			text : options.key + ": "
+			'for': 'slider_' + options.key,
+			text: options.key + ": "
 		}).appendTo(optionDiv);
 
 		// Create a lable
 		$('<span />', {
-			id : options.key + "amt",
-			text : options.defaultValue
+			id: options.key + "amt",
+			text: options.defaultValue
 		}).appendTo(optionDiv);
 
 		return slider;
 	},
 
-	HSVtoRGB : function(h, s, v) {
+	HSVtoRGB: function(h, s, v) {
 		var r,
-		    g,
-		    b;
+			g,
+			b;
 		h *= 6;
 		h = h % 6;
 
@@ -582,7 +582,7 @@ KColor.makeIDColor = function(idNumber) {
 
 var Vector = Class.extend({
 
-	init : function(x, y, z) {
+	init: function(x, y, z) {
 		// actually another vector, clone it
 		if (x === undefined) {
 			this.x = 0;
@@ -608,34 +608,34 @@ var Vector = Class.extend({
 			throw new Error(this.invalidToString() + " is not a valid vector");
 	},
 
-	clone : function() {
+	clone: function() {
 		return new Vector(this);
 	},
 
-	cloneInto : function(v) {
+	cloneInto: function(v) {
 		v.x = this.x;
 		v.y = this.y;
 		v.z = this.z;
 
 	},
 
-	addMultiple : function(v, m) {
+	addMultiple: function(v, m) {
 		this.x += v.x * m;
 		this.y += v.y * m;
 		this.z += v.z * m;
 	},
-	addPolar : function(r, theta) {
+	addPolar: function(r, theta) {
 		this.x += r * Math.cos(theta);
 		this.y += r * Math.sin(theta);
 	},
 
-	addSpherical : function(r, theta, phi) {
+	addSpherical: function(r, theta, phi) {
 		this.x += r * Math.cos(theta) * Math.cos(phi);
 		this.y += r * Math.sin(theta) * Math.cos(phi);
 		this.z += r * Math.sin(phi);
 	},
 
-	addRotated : function(v, theta) {
+	addRotated: function(v, theta) {
 		var cs = Math.cos(theta);
 		var sn = Math.sin(theta);
 		var x = v.x * cs - v.y * sn;
@@ -644,54 +644,54 @@ var Vector = Class.extend({
 		this.y += y;
 	},
 
-	setToPolar : function(r, theta) {
+	setToPolar: function(r, theta) {
 		this.x = r * Math.cos(theta);
 		this.y = r * Math.sin(theta);
 	},
-	setToCylindrical : function(r, theta, z) {
+	setToCylindrical: function(r, theta, z) {
 		this.x = r * Math.cos(theta);
 		this.y = r * Math.sin(theta);
 		this.z = z;
 	},
 
-	setToPolarOffset : function(v, r, theta) {
+	setToPolarOffset: function(v, r, theta) {
 		this.x = v.x + r * Math.cos(theta);
 		this.y = v.y + r * Math.sin(theta);
 		this.z = v.z;
 	},
 
-	setToSpherical : function(r, theta, phi) {
+	setToSpherical: function(r, theta, phi) {
 		this.x = r * Math.cos(theta) * Math.cos(phi);
 		this.y = r * Math.sin(theta) * Math.cos(phi);
 		this.z = r * Math.sin(phi);
 	},
 
-	setToMultiple : function(v, m) {
+	setToMultiple: function(v, m) {
 		this.x = v.x * m;
 		this.y = v.y * m;
 		this.z = v.z * m;
 	},
 
-	setToLerp : function(v0, v1, m) {
+	setToLerp: function(v0, v1, m) {
 		var m1 = 1 - m;
 		this.x = v0.x * m1 + v1.x * m;
 		this.y = v0.y * m1 + v1.y * m;
 		this.z = v0.z * m1 + v1.z * m;
 	},
 
-	setToAddMultiple : function(v0, m0, v1, m1) {
+	setToAddMultiple: function(v0, m0, v1, m1) {
 		this.x = v0.x * m0 + v1.x * m1;
 		this.y = v0.y * m0 + v1.y * m1;
 		this.z = v0.z * m0 + v1.z * m1;
 	},
 
-	setToDifference : function(v0, v1) {
+	setToDifference: function(v0, v1) {
 		this.x = v0.x - v1.x;
 		this.y = v0.y - v1.y;
 		this.z = v0.z - v1.z;
 	},
 
-	setTo : function(x, y, z) {
+	setTo: function(x, y, z) {
 		// Just in case this was passed a vector
 		if (x.x !== undefined) {
 			this.x = x.x;
@@ -711,22 +711,22 @@ var Vector = Class.extend({
 
 	},
 
-	setScreenPosition : function(g) {
+	setScreenPosition: function(g) {
 		if (this.screenPos === undefined)
 			this.screenPos = new Vector();
 
 		this.screenPos.setTo(g.screenX(this.x, this.y), g.screenY(this.x, this.y));
 	},
 
-	magnitude : function() {
+	magnitude: function() {
 		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
 	},
 
-	normalize : function() {
+	normalize: function() {
 		this.div(this.magnitude());
 	},
 
-	constrainMagnitude : function(min, max) {
+	constrainMagnitude: function(min, max) {
 		var d = this.magnitude();
 		if (d !== 0) {
 			var d2 = utilities.constrain(d, min, max);
@@ -734,21 +734,21 @@ var Vector = Class.extend({
 		}
 	},
 
-	getDistanceTo : function(p) {
+	getDistanceTo: function(p) {
 		var dx = this.x - p.x;
 		var dy = this.y - p.y;
 		var dz = this.z - p.z;
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	},
 
-	getDistanceToIgnoreZ : function(p) {
+	getDistanceToIgnoreZ: function(p) {
 		var dx = this.x - p.x;
 		var dy = this.y - p.y;
 
 		return Math.sqrt(dx * dx + dy * dy);
 	},
 
-	getAngleTo : function(p) {
+	getAngleTo: function(p) {
 		var dx = this.x - p.x;
 		var dy = this.y - p.y;
 		//var dz = this.z - p.z;
@@ -759,18 +759,18 @@ var Vector = Class.extend({
 	//===========================================================
 	// Complex geometry
 
-	dot : function(v) {
+	dot: function(v) {
 		return v.x * this.x + v.y * this.y + v.z * this.z;
 	},
-	cross : function(v) {
+	cross: function(v) {
 		return new Vector(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x);
 	},
 
-	getAngleBetween : function(v) {
+	getAngleBetween: function(v) {
 		return Math.acos(this.dot(v) / (this.magnitude() * v.magnitude()));
 	},
 
-	getCrossAngleBetween : function(v) {
+	getCrossAngleBetween: function(v) {
 		var cross = this.cross(v);
 		if (cross.z > 0)
 			return -Math.asin(cross.magnitude() / (this.magnitude() * v.magnitude()));
@@ -778,13 +778,13 @@ var Vector = Class.extend({
 			return Math.asin(cross.magnitude() / (this.magnitude() * v.magnitude()));
 	},
 
-	getNormalizedAngleBetween : function(v) {
+	getNormalizedAngleBetween: function(v) {
 		var theta0 = this.getAngle();
 		var theta1 = v.getAngle();
 		return normalizeAngle(theta1 - theta0);
 	},
 
-	isInTriangle : function(triangle) {
+	isInTriangle: function(triangle) {
 
 		//credit: http://www.blackpawn.com/texts/pointinpoly/default.html
 		var ax = triangle[0].x;
@@ -813,13 +813,13 @@ var Vector = Class.extend({
 
 	},
 
-	isInPolygon : function(poly) {
+	isInPolygon: function(poly) {
 		var pt = this;
 		for (var c = false,
-		    i = -1,
-		    l = poly.length,
-		    j = l - 1; ++i < l; j = i)
-			((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y)) && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) && ( c = !c);
+				i = -1,
+				l = poly.length,
+				j = l - 1; ++i < l; j = i)
+			((poly[i].y <= pt.y && pt.y < poly[j].y) || (poly[j].y <= pt.y && pt.y < poly[i].y)) && (pt.x < (poly[j].x - poly[i].x) * (pt.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) && (c = !c);
 		return c;
 	},
 
@@ -827,35 +827,35 @@ var Vector = Class.extend({
 	//===========================================================
 	// Add and sub and mult and div functions
 
-	add : function(v) {
+	add: function(v) {
 		this.x += v.x;
 		this.y += v.y;
 		this.z += v.z;
 	},
 
-	sub : function(v) {
+	sub: function(v) {
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
 	},
-	mult : function(m) {
+	mult: function(m) {
 		this.x *= m;
 		this.y *= m;
 		this.z *= m;
 	},
-	div : function(m) {
+	div: function(m) {
 		this.x /= m;
 		this.y /= m;
 		this.z /= m;
 	},
-	getOffsetTo : function(v) {
+	getOffsetTo: function(v) {
 		return new Vector(v.x - this.x, v.y - this.y, v.z - this.z);
 	},
-	getAngle : function() {
+	getAngle: function() {
 		return Math.atan2(this.y, this.x);
 	},
 
-	rotate : function(theta) {
+	rotate: function(theta) {
 		var cs = Math.cos(theta);
 		var sn = Math.sin(theta);
 		var x = this.x * cs - this.y * sn;
@@ -864,7 +864,7 @@ var Vector = Class.extend({
 		this.y = y;
 	},
 
-	rotateX : function(theta) {
+	rotateX: function(theta) {
 		var cs = Math.cos(theta);
 		var sn = Math.sin(theta);
 		var z = this.z * cs - this.y * sn;
@@ -877,14 +877,14 @@ var Vector = Class.extend({
 	//===========================================================
 
 	// Lerp a vector!
-	lerp : function(otherVector, percent) {
+	lerp: function(otherVector, percent) {
 		var lerpVect = new Vector(utilities.lerp(this.x, otherVector.x, percent), utilities.lerp(this.y, otherVector.y, percent), utilities.lerp(this.z, otherVector.z, percent));
 		return lerpVect;
 	},
 
 	//===========================================================
 	//===========================================================
-	isValid : function() {
+	isValid: function() {
 		var hasNaN = isNaN(this.x) || isNaN(this.y) || isNaN(this.z);
 		var hasUndefined = this.x === undefined || this.y === undefined || this.z === undefined;
 		var hasInfinity = Math.abs(this.x) === Infinity || Math.abs(this.y) === Infinity || Math.abs(this.z) === Infinity;
@@ -897,70 +897,70 @@ var Vector = Class.extend({
 
 	//===========================================================
 	//===========================================================
-	translateTo : function(g) {
+	translateTo: function(g) {
 		g.translate(this.x, this.y);
 	},
 
 	//===========================================================
 	//===========================================================
 
-	bezier : function(g, c0, c1) {
+	bezier: function(g, c0, c1) {
 		g.bezierVertex(c0.x, c0.y, c1.x, c1.y, this.x, this.y);
 	},
 
-	bezierTo : function(g, c0, c1, p) {
+	bezierTo: function(g, c0, c1, p) {
 		g.bezier(this.x, this.y, c0.x, c0.y, c1.x, c1.y, p.x, p.y);
 	},
-	bezierWithRelativeControlPoints : function(g, p, c0, c1) {
+	bezierWithRelativeControlPoints: function(g, p, c0, c1) {
 		// "x" and "y" were not defined, so I added "this." in front. Hopefully that's the intended action (April)
 		g.bezierVertex(p.x + c0.x, p.y + c0.y, this.x + c1.x, this.y + c1.y, this.x, this.y);
 	},
 
-	vertex : function(g) {
+	vertex: function(g) {
 		g.vertex(this.x, this.y);
 	},
 
-	offsetVertex : function(g, offset, m) {
+	offsetVertex: function(g, offset, m) {
 		if (m === undefined)
 			m = 1;
 		g.vertex(this.x + offset.x * m, this.y + offset.y * m);
 	},
 
-	drawCircle : function(g, radius) {
+	drawCircle: function(g, radius) {
 		g.ellipse(this.x, this.y, radius, radius);
 	},
 
-	drawOffsetCircle : function(g, offset, radius) {
+	drawOffsetCircle: function(g, offset, radius) {
 		g.ellipse(this.x + offset.x, this.y + offset.y, radius, radius);
 	},
 
-	drawOffsetMultipleCircle : function(g, offset, m, radius) {
+	drawOffsetMultipleCircle: function(g, offset, m, radius) {
 		g.ellipse(this.x + offset.x * m, this.y + offset.y * m, radius, radius);
 	},
 
-	drawLineTo : function(g, v) {
+	drawLineTo: function(g, v) {
 		g.line(this.x, this.y, v.x, v.y);
 	},
 
-	drawOffsetLineTo : function(g, v, m, offset) {
+	drawOffsetLineTo: function(g, v, m, offset) {
 		var mx = m * offset.x;
 		var my = m * offset.y;
 
 		g.line(this.x + mx, this.y + my, v.x + mx, v.y + my);
 	},
 
-	drawLerpedLineTo : function(g, v, startLerp, endLerp) {
+	drawLerpedLineTo: function(g, v, startLerp, endLerp) {
 		var dx = v.x - this.x;
 		var dy = v.y - this.y;
 
 		g.line(this.x + dx * startLerp, this.y + dy * startLerp, this.x + dx * endLerp, this.y + dy * endLerp);
 	},
 
-	drawArrow : function(g, v, m) {
+	drawArrow: function(g, v, m) {
 		g.line(this.x, this.y, v.x * m + this.x, v.y * m + this.y);
 	},
 
-	drawArrowHead : function(g, v, m) {
+	drawArrowHead: function(g, v, m) {
 		var head = 10;
 		var d = v.magnitude() * m;
 		g.pushMatrix();
@@ -975,7 +975,7 @@ var Vector = Class.extend({
 		g.popMatrix();
 	},
 
-	drawArrowWithHead : function(g, v, m, headSize, offsetLength, offsetNormal) {
+	drawArrowWithHead: function(g, v, m, headSize, offsetLength, offsetNormal) {
 		if (isNaN(offsetLength))
 			offsetLength = 0;
 		if (isNaN(offsetNormal))
@@ -1002,15 +1002,15 @@ var Vector = Class.extend({
 		g.popMatrix();
 	},
 
-	drawAngle : function(g, r, theta) {
+	drawAngle: function(g, r, theta) {
 		g.line(this.x, this.y, r * Math.cos(theta) + this.x, r * Math.sin(theta) + this.y);
 	},
 
-	drawAngleBall : function(g, r, theta, radius) {
+	drawAngleBall: function(g, r, theta, radius) {
 		g.ellipse(r * Math.cos(theta) + this.x, r * Math.sin(theta) + this.y, radius, radius);
 	},
 
-	drawArc : function(g, r, theta0, theta1) {
+	drawArc: function(g, r, theta0, theta1) {
 		var range = theta1 - theta0;
 		var segments = Math.ceil(range / .2);
 		for (var i = 0; i < segments + 1; i++) {
@@ -1019,51 +1019,51 @@ var Vector = Class.extend({
 		}
 	},
 
-	drawText : function(g, s, xOffset, yOffset) {
+	drawText: function(g, s, xOffset, yOffset) {
 		g.text(s, this.x + xOffset, this.y + yOffset);
 	},
 	//===========================================================
 	//===========================================================
-	toThreeVector : function() {
+	toThreeVector: function() {
 		return new THREE.Vector3(this.x, this.y, this.z);
 	},
-	toSVG : function() {
+	toSVG: function() {
 		return Math.round(this.x) + " " + Math.round(this.y);
 	},
 
-	toB2D : function() {
+	toB2D: function() {
 		return new Box2D.b2Vec2(this.x, -this.y);
 	},
 
-	toCSSDimensions : function() {
+	toCSSDimensions: function() {
 		return {
-			width : this.x + "px",
-			height : this.y + "px",
+			width: this.x + "px",
+			height: this.y + "px",
 
 		};
 	},
 
-	toCSSTranslate : function() {
+	toCSSTranslate: function() {
 		return "translate(" + this.x.toFixed(2) + "px, " + this.y.toFixed() + "px)";
 	},
 
 	//===========================================================
 	//===========================================================
 
-	toString : function(precision) {
+	toString: function(precision) {
 		if (precision === undefined)
 			precision = 2;
 
 		return "(" + this.x.toFixed(precision) + ", " + this.y.toFixed(precision) + ", " + this.z.toFixed(precision) + ")";
 	},
 
-	toSimpleString : function() {
+	toSimpleString: function() {
 		precision = 1;
 		return "(" + this.x.toFixed(precision) + ", " + this.y.toFixed(precision) + ")";
 
 	},
 
-	invalidToString : function() {
+	invalidToString: function() {
 
 		return "(" + this.x + ", " + this.y + ", " + this.z + ")";
 	},
@@ -1120,7 +1120,7 @@ Vector.calculateIntersection = function(p, q, u, v) {
 
 
 function getRandom(arr) {
-	return arr[Math.floor(Math.random()*arr.length)];
+	return arr[Math.floor(Math.random() * arr.length)];
 }
 
 
@@ -1222,7 +1222,7 @@ function splitStrict(s, splitChar) {
 	}
 
 	splitAt(s.length);
-	
+
 
 	if (levels.length > 0)
 		console.warn("Mismatched: expected ", levels.map(function(level) {
@@ -1234,13 +1234,31 @@ function splitStrict(s, splitChar) {
 }
 
 
-function toClosedTag(tagName, attributes) {
+
+function attrToString(attributes) {
+	var s = "";
+	if (attributes) {
+		$.each(attributes, function(key, val) {
+			s += " " + key + "=" + inQuotes(val);
+		});
+	}
+	return s;
+}
+
+function toCSSHSLA(h, s, l, a) {
+	return "hsla(" + (h*360).toFixed(2) + "," + (s*100).toFixed(2) + "%," + (l*100).toFixed(2) + "%," + a.toFixed(2) +")"
+}
+
+function toClosedTag(tagName, attributes, attrString) {
 	var s = "<" + tagName;
 	if (attributes) {
 		$.each(attributes, function(key, val) {
 			s += " " + key + "=" + inQuotes(val);
 		});
+	}
 
+	if (attrString) {
+		s += " " + attrString;
 	}
 	s += "/>";
 	return s;
@@ -1263,3 +1281,41 @@ function inQuotes(s) {
 	return '"' + s + '"';
 }
 
+// https://gmigdos.wordpress.com/2011/01/13/javascript-convert-rgb-values-to-hsl/
+function rgb2hsl(rgbArr){
+    var r1 = rgbArr[0] / 255;
+    var g1 = rgbArr[1] / 255;
+    var b1 = rgbArr[2] / 255;
+ 
+    var maxColor = Math.max(r1,g1,b1);
+    var minColor = Math.min(r1,g1,b1);
+    //Calculate L:
+    var L = (maxColor + minColor) / 2 ;
+    var S = 0;
+    var H = 0;
+    if(maxColor != minColor){
+        //Calculate S:
+        if(L < 0.5){
+            S = (maxColor - minColor) / (maxColor + minColor);
+        }else{
+            S = (maxColor - minColor) / (2.0 - maxColor - minColor);
+        }
+        //Calculate H:
+        if(r1 == maxColor){
+            H = (g1-b1) / (maxColor - minColor);
+        }else if(g1 == maxColor){
+            H = 2.0 + (b1 - r1) / (maxColor - minColor);
+        }else{
+            H = 4.0 + (r1 - g1) / (maxColor - minColor);
+        }
+    }
+ 
+    L = L * 100;
+    S = S * 100;
+    H = H * 60;
+    if(H<0){
+        H += 360;
+    }
+    var result = [H, S, L];
+    return result;
+}

@@ -5,17 +5,14 @@ var Artist = Class.extend({
 		if (!settings)
 			console.warn("No settings provided");
 
-		if (!settings.grammarGenerator && !settings.grammar)
-			console.warn("No grammar generator or grammar provided");
 
 		this.id = artBotCount++;
 		this.name = "Artist" + this.id;
 
-		if (settings.grammar) {
-			this.grammar = tracery.createGrammar(settings.grammar);
-		} else {
-			this.grammar = tracery.createGrammar(settings.grammarGenerator.generate());
-		}
+		this.artGrammars = [];
+		this.artGrammars.push(new ArtGrammar());
+
+		this.favoriteHue = Math.random();
 
 		this.art = [];
 
@@ -23,12 +20,14 @@ var Artist = Class.extend({
 
 
 	createArt: function(count) {
+		var grammar = getRandom(this.artGrammars);
 		var art = [];
+
 		for (var i = 0; i < count; i++) {
+
 			art.push(new Art(this, {
-				generator: this.grammar,
-
-
+				generator: grammar,
+				tree: grammar.generate()
 			}));
 		}
 

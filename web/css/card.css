@@ -4,10 +4,12 @@
 	margin: 3px;
 	min-width: 10px;
 	overflow: hidden;
+	
 	background-color: hsl(230, 20%, 80%);
 	box-shadow: 1px 1px 2px rgba(0, 0, 0, .6);
 	text-align: center;
-	width: 200px;
+	max-width: 500px;
+	
 }
 
 .card.selected {
