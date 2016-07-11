@@ -13,17 +13,16 @@ var Art = Class.extend({
 		this.size = new Vector(artSize);
 		this.artist = artist;
 
+		//are we really using the calculations array?
 		this.calculations = [];
-
 		this.calculations[0] = Math.random();
 		this.calculations[1] = Math.random();
 		this.calculations[2] = Math.random();
 		this.calculations[3] = Math.random();
+
 		this.selfrating = -1;
 
 		this.renderToPixels(callback);
-
-
 	},
 
 
@@ -56,7 +55,7 @@ var Art = Class.extend({
 			//console.log(c);
 			//console.log(c + " " + r + ", " + g + ", " + b);
 			var bucket = Math.floor((c[0] / 360) * bucketCount);
-			var strength = (c[1] / 100) * (1 - .02 * Math.abs(50 - c[2]) * .01);
+			var strength = (c[1] / 100) * (1 - 0.02 * Math.abs(50 - c[2]) * 0.01);
 			//console.log(c.sat + " " + c.value + " " + bucket + " " + strength);
 			this.hueDist[bucket] += strength;
 			total += 1;
@@ -65,9 +64,10 @@ var Art = Class.extend({
 		for (var i = 0; i < bucketCount; i++) {
 			this.hueDist[i] /= total;
 		}
+	},
 
+	calculateContrastDist: function(){
 
-	
 	},
 
 	renderToPixels: function(callback) {
@@ -84,7 +84,7 @@ var Art = Class.extend({
 			art.pixelData = pixelData;
 			art.image = imgURL;
 			art.calculateHueDist();
-	callback(art);
+			callback(art);
 		});
 
 

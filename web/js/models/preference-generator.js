@@ -12,18 +12,7 @@ var PreferenceGenerator = Class.extend({
 	// Creates a heuristic function (looking at some state internal to the closure?)
 	// Real heuristics goes here
 	generate: function() {
-		var preference = {
-			favoriteHue: Math.random(),
-			evaluate: function(art) {
-				if (art.pixels)
-					return Math.random();
-				else
-					return Math.random();
-			}
-		};
-
+		var preference = new Preference();
 		return preference;
-
 	}
-
 });

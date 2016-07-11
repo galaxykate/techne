@@ -9,7 +9,7 @@ var GrammarGenerator = Class.extend({
 	},
 
 
-	// Create a json object that generates 
+	// Create a json object that generates
 	generate: function() {
 		var w = artSize.x;
 		var h = artSize.y;
@@ -63,7 +63,6 @@ var GrammarGenerator = Class.extend({
 					width: 8,
 					height: 8,
 					fill: "hsl(" + (35 * i + 190)%360 + ", 100%," + (10 + j * 9) + "%)",
-
 				});
 			}
 		}

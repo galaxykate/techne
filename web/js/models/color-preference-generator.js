@@ -43,7 +43,7 @@ var ColorPreferenceGenerator = PreferenceGenerator.extend({
           //TODO: assume rgba pixel structure, and right now we don't really care
           //about the alpha part
           var score = 0;
-          console.log(this.favoriteColor);
+
           for(let i = 0; i < art.pixels.length; i += 4){
             if(this.favoriteColor.r == art.pixels[i] || this.favoriteColor.g == art.pixels[i+1] || this.favoriteColor.b == art.pixels[i+2]){
               score += 1;
