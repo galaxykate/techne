@@ -14,11 +14,16 @@ var Critic = Class.extend({
 
 	critiqueArt: function(art) {
 		// Apply the function to the art
-		return new Critique(this, art, this.preference.evaluate(art));
+		var crit = new Critique(this, art, this.preference.apply(art));
+		this.critiques.push(crit);
+		return crit;
 	},
 
 	toString: function() {
 		return this.name;
-	}
+	},
 
+	clearCritiques: function(){
+		this.critiques = [];
+	}
 });

@@ -66,8 +66,58 @@ var Art = Class.extend({
 		}
 	},
 
-	calculateContrastDist: function(){
+	calculateContrastScore: function(){
+		this.calculations[0] = 0; //set a place to store the global contrast score
+		this.contrastScore = 0; //also labeling a seperate spot for this...
+		this.calculations[0] = getContrastRatio(this.pixelData);
+		this.contrastScore = this.calculations[0];
+		//console.log("Calculated Contrast Scores:");
+		//console.log(this.calculations[0]);
+		//console.log(this.contrastScore);
+	},
 
+	/**
+	 * Unused.  Function was to get a distribution of contrast scores in the
+	 * image from running looking at parts of the window.
+	 * @return {None} Set the art's property, doesn't return in traditional sense
+	 */
+	calculateContrastDist: function(){
+		this.contrastDist = [];
+
+		var bucketCount = 16;
+		var total = 0;
+		for (var i = 0; i < bucketCount; i++) {
+			this.contrastDist[i] = 0;
+		}
+
+		var w = this.size.x;
+		var h = this.size.y;
+
+		//doing large tiles for contrast bins
+		var tileSize = 3;
+		for(var y = 0; y < h - tileSize; y += tileSize) {
+			for(var x = 0; x < w - tileSize; x += tileSize) {
+				var pixelWindow = [];
+
+				for(var v=0; v < tileSize; v++){
+					for(var u=0; u < tileSize; u++){
+						pixelWindow = pixelWindow.concat(getPixel(this.pixelData, w, h, x + u, y + v));
+					}
+				}
+
+				var contrastRatio = getContrastRatio(pixelWindow);
+				var bucket = Math.floor((contrastRatio / 21) * bucketCount);
+				this.contrastDist[bucket] += (Math.pow(contrastRatio, Math.E));
+				total += 1;
+			}
+		}
+
+		//console.log("Total Calcs: ", total);
+		for(var i = 0; i < bucketCount; i++){
+			this.contrastDist[i] /= total;
+		}
+
+		console.log("Distribution Buckets: " + this.contrastDist.length);
 	},
 
 	renderToPixels: function(callback) {
@@ -84,10 +134,10 @@ var Art = Class.extend({
 			art.pixelData = pixelData;
 			art.image = imgURL;
 			art.calculateHueDist();
+			art.calculateContrastScore();
+			//art.calculateContrastDist();
 			callback(art);
 		});
-
-
 	},
 
 

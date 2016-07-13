@@ -22,6 +22,7 @@ function clearSim() {
 function createPreferenceGenerators(count) {
 	for (var i = 0; i < count; i++) {
 		//pulled out the random preference generator, put in the color preference generator
+		sim.preferenceGenerators.push(new ContrastPreferenceGenerator());
 		sim.preferenceGenerators.push(new ColorPreferenceGenerator());
 	}
 }
@@ -95,13 +96,10 @@ function critAndSave(art, critic, sim) {
 function critiqueAll() {
 	for (var i = 0; i < sim.critics.length; i++) {
 		for (var j = 0; j < sim.art.length; j++) {
-			//a bit awkward.  The second parameter is a callback function that does what it needs to with the pixel data
-			//the third is a parameter array to the second argument
-			//woo smushing in a recusrive function into an interative context!
-			svgToPixels(sim.art[j], critAndSave, [sim.critics[i], sim]);
+			var crit = sim.critics[i].critiqueArt(sim.art[j]);
+			sim.critiques.push(crit);
 		}
 	}
-
 }
 
 function getCritsFor(art) {
