@@ -6,7 +6,7 @@ var ColorPreferenceGenerator = PreferenceGenerator.extend({
     //optional parameter color.  We can either generate one here, or get a
     //color from elserwhere
     this._super();
-    this.name = "ColorPreference" + this.id; //overwrite the names
+    this.name = "ColorPreferenceGenerator" + this.id; //overwrite the names
 
     if(color){
       this.prefColor = color;

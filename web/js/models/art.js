@@ -13,12 +13,9 @@ var Art = Class.extend({
 		this.size = new Vector(artSize);
 		this.artist = artist;
 
-		//are we really using the calculations array?
+		//art can calculate some properites about itself.
+		//These properties are stored in the calculations array.
 		this.calculations = [];
-		this.calculations[0] = Math.random();
-		this.calculations[1] = Math.random();
-		this.calculations[2] = Math.random();
-		this.calculations[3] = Math.random();
 
 		this.selfrating = -1;
 
@@ -67,16 +64,47 @@ var Art = Class.extend({
 	},
 
 	calculateContrastScore: function(){
-		this.calculations[0] = 0; //set a place to store the global contrast score
-		this.contrastScore = 0; //also labeling a seperate spot for this...
-		this.calculations[0] = getContrastRatio(this.pixelData);
-		this.contrastScore = this.calculations[0];
-		//console.log("Calculated Contrast Scores:");
-		//console.log(this.calculations[0]);
-		//console.log(this.contrastScore);
+		this.contrastScore = getContrastRatio(this.pixelData);
+		this.calculations.push(this.contrastScore);
+	},
+
+	calculateEdgeScore: function(){
+		var w = this.size.x;
+		var h = this.size.y;
+		var scores = [];
+		//doing large tiles for contrast bins
+		//apply to every pixel!
+		var tileSize = 3;
+		for(var y = 0; y < h - tileSize; y++) {
+			for(var x = 0; x < w - tileSize; x++) {
+				var pixelWindow = [];
+
+				for(var v=0; v < tileSize; v++){
+					for(var u=0; u < tileSize; u++){
+						pixelWindow = pixelWindow.concat(getPixel(this.pixelData, w, h, x + u, y + v));
+					}
+				}
+				//scores near zero mean that this is probably not a pixel.
+				//high scores mean that this is probably a pixel
+				scores.push(Math.abs(applyKernel(pixelWindow, edgeDetectionKernel)));
+			}
+		}
+
+		//display the score as the ratio of edge results to total number of results
+		var numEdges = scores.reduce(function(iter, val){
+			if(val > 0){
+				return iter + 1;
+			}else{
+				return iter + 0;
+			}
+		});
+		var finalScore = numEdges / scores.length;
+		this.calculations.push(finalScore);
+		this.edgeScore = finalScore;
 	},
 
 	/**
+	 * !!!DEPRECIATED!!!
 	 * Unused.  Function was to get a distribution of contrast scores in the
 	 * image from running looking at parts of the window.
 	 * @return {None} Set the art's property, doesn't return in traditional sense
@@ -135,6 +163,7 @@ var Art = Class.extend({
 			art.image = imgURL;
 			art.calculateHueDist();
 			art.calculateContrastScore();
+			art.calculateEdgeScore();
 			//art.calculateContrastDist();
 			callback(art);
 		});

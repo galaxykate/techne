@@ -247,6 +247,7 @@ function createArtCard(holder, art) {
 					//scale the contrast score back to [0,1]
 					val = linearScale([0, 21], [0, 1], val);
 				}
+				//probably something smart to do with edginess, but meh.
 				var c = new KColor(val * 0.7 + 0.8, 1.2 - 0.6 * val, 0.5 + 0.5 * val);
 
 				$("<div/>", {
@@ -321,9 +322,16 @@ function createCriticCard(holder, critic) {
 			html: "favorite contrast ratio: <span STYLE='font-weight:bold'>" + contrast.toFixed(2) + "</span>"
 		}).appendTo(card.title);
 	}
-	console.log(card);
+	if(critic.preference.name.includes("EdgePreference")){
+		var edginess = critic.preference.preferredValue;
+		console.log("Trying to display preferred edginess: ", edginess);
+		card.favoriteContrast = $("<div/>", {
+			class: "card-info",
+			html: "favorite edginess: <span STYLE='font-weight:bold'>" + edginess.toFixed(2) + "</span>"
+		}).appendTo(card.title);
+	}
 	critic.card = card;
-	console.log(critic.card);
+
 	ui.cards.push(card);
 
 }

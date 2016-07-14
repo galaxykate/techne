@@ -2,10 +2,9 @@
 //may be some duplication between this and common.js, I just got very afraid of
 //common.js.
 
-//Sorry, Kate.
 
 //library of useful functions to share across various modules
-
+var edgeDetectionKernel = [0, -1, 0, -1, 4, -1, 0, -1, 0];
 /**
  * Convert RGB to a hex string
  * @param  {Number} r red code
@@ -136,4 +135,39 @@ function getContrastRatio(pixels){
 function getPixel(pixels, w, h, x, y){
    var idx = (x + y * w) * 4;
    return [pixels[idx], pixels[idx+1], pixels[idx+2], pixels[idx+3]];
+}
+
+/**
+ * Apply a provided kernel to a bunch of pixels
+ * @param  {Array} pixels pixel data (in rgba)
+ * @param  {Array} kernel kernel to apply to these pixels
+ * @return {Number}        new set of pixel data / result from kernel application
+ */
+function applyKernel(pixels, kernel){
+  if(pixels.length != kernel.length * 4){
+    console.log("Num pixels: ", pixels.length / 4);
+    console.log("Num kernel components: ", kernel.length);
+    throw "Invalid kernel op!  Lengths seperate.";
+  }
+
+  var packedPixels = [];
+  for(let i = 0; i < pixels.length; i+=4){
+    //pack the pixel into a single number to do math with
+    var pixNum = (pixels[i] << 16) + (pixels[i+1] << 8) + pixels[i+2];
+    packedPixels.push(pixNum);
+  }
+
+  if(packedPixels.length != kernel.length){
+    console.log("Packed pixel length: ", packedPixels.length);
+    console.log("Kernel length: ", kernel.length);
+    throw "Pixel packing fucked up somewhere, kernel is not the same length as packed pixels!";
+  }
+
+  var appliedValues = packedPixels.map(function(val, idx){
+    return val * kernel[idx];
+  });
+
+  return appliedValues.reduce(function(sum, val, idx){
+    return sum + val;
+  });
 }

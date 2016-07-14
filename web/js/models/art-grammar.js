@@ -34,7 +34,7 @@ var ArtGrammar = Class.extend({
 				fill: "#color#"
 			}),
 
-			shapes: ["#shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape#"],
+			shapes: ["#shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape##shape#", "#shape#"],
 			art: toTag("svg", {
 				viewBox: "0 0 " + w + " " + h,
 				width: w,

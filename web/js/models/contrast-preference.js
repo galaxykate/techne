@@ -17,7 +17,7 @@ var ContrastPreference = Preference.extend({
   },
 
   apply : function(art){
-    if(art.contrastScore){
+    if(art.contrastScore !== undefined && !Number.isNaN(art.contrastScore)){
       //get a distance
       var distance = art.contrastScore - this.preferredValue;
       //flip this, such that higher numbers mean we like the art more
