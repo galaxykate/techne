@@ -1,0 +1,161 @@
+#panels {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+.panel {
+	z-index: 40;
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+
+	min-width: 140px;
+	min-height: 100px;
+	background-color: hsl(40, 10%, 90%);
+	box-shadow: 1px 2px 10px rgba(0, 0, 0, .8);
+}
+.panel.selected {
+z-index: 60;
+	box-shadow: rgba(255, 255, 255, 1), 1px 2px 10px rgba(0, 0, 0, 1);
+}
+
+.panel-header {
+	background-color: hsl(40, 10%,95%);
+}
+
+.panel-contents {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	background-color: hsl(40, 10%,80%);
+
+}
+.column {
+	position: relative;
+	flex: 0 0;
+	
+}
+
+.selected {
+	box-shadow: inset 0px 0px 0px 3px rgba(255, 255, 255, .8), 1px 2px 5px 1px rgba(0, 0, 0, .8);
+}
+
+.bot-thumbnail {
+	background-color: hsl(240, 90%,40%);
+	width: 100px;
+	height: 100px;
+}
+
+#bot-panel {
+	height: 650px;
+	width: 1050px;
+}
+
+#critique-panel {
+	top: 0px;
+	left: 450px;
+	width: 400px;
+	height: 200px;
+}
+#generator-panel {
+	top: 200px;
+	left: 450px;
+	width: 400px;
+	height: 400px;
+}
+#social-panel {
+	top: 0px;
+	left: 830px;
+	width: 400px;
+	height: 400px;
+}
+
+.grammar-view {
+	display: inline-block;
+	padding: 3px;
+	margin: 3px;
+	background-color: hsla(240, 90%,40%, .5);
+	
+}
+.grammar-view-symbol {
+	margin: 2px;
+	border-radius: 6px;
+	background-color: hsla(40, 10%,90%, .5);
+}
+.grammar-view-key {
+	font-weight: bold;
+	display: inline-block;
+	margin: 2px;
+	padding: 2px 4px;
+	border-radius: 16px;
+	background-color: hsla(40, 10%,90%, .5);
+}
+.grammar-view-rule {
+	position: relative;
+	display: inline-block;
+	padding: 2px 4px;
+	margin: 2px;
+background-color: hsla(40, 10%,90%, .5);
+}
+.grammar-view-rule .strikethrough {
+	position: absolute;
+	top: 40%;
+	width: 98%;
+   height: 6px;
+   transform: rotate(4deg);
+   background-color: rgba(0, 0, 0, .8);
+  }
+
+
+#bot-artview-column {
+	
+	width: 640px;
+}
+
+.art-view {
+padding: 5px;
+}
+
+.art-view-title {
+
+}
+.art-view-thumbnail {
+	width: 90px;
+	height: 120px;
+}
+
+.section-content {
+	height: 90%;
+	overflow: scroll;
+}
+
+.bot-view.card {
+	background-color: rgba(150, 150, 150,1);
+	width: 100px;
+	text-align: center;
+
+}
+
+.bot-name {
+font-size: 12px;
+}
+
+.bot-colorholder {
+font-size: 12px;
+}.bot-happinessholder {
+font-size: 12px;
+}
+
+.bot-happiness {
+	display: inline-block;
+
+}
+.bot-colordot {
+	display: inline-block;
+	position: relative;
+	border-radius: 20px;
+	width: 15px;
+	height: 15px;
+		box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, .8);
+}

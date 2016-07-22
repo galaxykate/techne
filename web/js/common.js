@@ -1264,7 +1264,9 @@ function toClosedTag(tagName, attributes, attrString) {
 	return s;
 }
 
-
+function toSVGBezier(cp0, cp1, p) {
+	return "C" + cp0.toSVG() + " " + cp1.toSVG() + " " + p.toSVG();
+}
 function toTag(tagName, attributes, contents) {
 	var s = "<" + tagName;
 	if (attributes) {
@@ -1318,4 +1320,22 @@ function rgb2hsl(rgbArr){
     }
     var result = [H, S, L];
     return result;
+}
+
+
+// http://stackoverflow.com/questions/24816/escaping-html-strings-with-jquery
+var entityMap = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': '\\&quot;',
+	"'": '&#39;',
+	"/": '&#x2F;',
+	"\\": '\\\\'
+};
+
+function escapeHtml(string) {
+	return String(string).replace(/[&<>"'\/\\]/g, function(s) {
+		return entityMap[s];
+	});
 }

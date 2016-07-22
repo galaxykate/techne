@@ -9,6 +9,7 @@
 	<meta name="description" content="The HTML5 Herald">
  	<meta name="author" content="SitePoint">
 	<link rel="stylesheet" href="css/page.css?v=1.0">
+	<link rel="stylesheet" href="css/panels.css?v=1.0">
 	<link rel="stylesheet" href="css/card.css?v=1.0">
 	<link rel="stylesheet" href="css/tracery-ui.css?v=1.0">
 	<link rel="stylesheet" href="css/techne.css?v=1.0">
@@ -48,6 +49,78 @@
 				</div>
 			</div>
 
+			</div>
+			<div id="panels">
+				<div id="bot-panel" class="panel selected">
+					<div class="panel-header">Bot Maker</div>
+					<div class="panel-contents">
+						<div class="column">
+							<div class="controls section-header">
+								Bots
+								<button id="bot-panel-addbot">+</button>
+							
+							</div>
+							<div class="section-content" id="bot-panel-botviews">
+							</div>
+						</div>
+
+						<div class="column">
+							<div class="controls section-header">
+								Art generators
+								<button id="bot-panel-addgenerator">+</button>
+							
+							</div>
+							<div class="section-content" id="bot-panel-grammarviews">
+							</div>
+						</div>	
+
+						<div class="" id="bot-artview-column">
+							<div class="controls  section-header">
+								Art 
+								<button id="bot-panel-addart">+</button>
+								<button id="bot-panel-rerollart" >🎲</button>
+							</div>
+							<div  class="section-content" id="bot-panel-artviews">
+							</div>
+						</div>
+
+						
+					</div>
+					
+				</div> 
+				<div id="critique-panel" class="panel">
+					<div class="panel-header">Test evaluate</div>
+					
+					<div class="panel-contents">
+						<div class="column">
+							<div class="controls">
+								Critique
+							</div>
+							<div class="bot-thumbnail" id="critique-panel-botdrop"></div>
+							<select id="critique-panel-selectcrit"></select>
+						</div>	
+						<div class="column">
+							<div class="controls">
+								Art
+							</div>
+							<div class="artholder" id="critique-panel-artdrop"></div>
+						</div>	
+					</div>
+				</div> 
+				<div id="generator-panel" class="panel">
+					<div class="panel-header">Modify generators</div>
+					
+					<div class="panel-contents">
+						<div>
+							<div id="generator-panel-basegrammar" class="grammar-view"></div>
+							<div id="generator-panel-sourcegrammar" class="grammar-view"></div>
+						</div>
+						<div id="generator-panel-variants"></div>
+					</div>
+				</div> 
+				<div id="social-panel" class="panel"></div> 
+
+
 		</div>
 	</div>
 
@@ -58,7 +131,10 @@
 	<script type="text/javascript" src="js/vendor/inheritance.js"></script>
 	<script type="text/javascript" src="js/vendor/simplex_noise.js"></script>
 	<script type="text/javascript" src="js/vendor/seedrandom.js"></script>
-	<script type="text/javascript" src="js/vendor/tracery/tracery.js"></script>
+	<script type="text/javascript" src="js/vendor/tracery/tracery-ui.js"></script>
+	<script type="text/javascript" src="js/vendor/tracery/tracery-node.js"></script>
+	<script type="text/javascript" src="js/vendor/tracery/tracery-grammar.js"></script>
+	<script type="text/javascript" src="js/vendor/tracery/parsing.js"></script>
 
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/models/art.js"></script>
@@ -72,7 +148,11 @@
 	<script type="text/javascript" src="js/techne-common.js"></script>
 	<script type="text/javascript" src="js/io.js"></script>
 	<script type="text/javascript" src="js/ui.js"></script>
+	
+	<script type="text/javascript" src="js/panels.js"></script>
+	<script type="text/javascript" src="js/bot.js"></script>
 	<script type="text/javascript" src="js/sim.js"></script>
+	
 	<script type="text/javascript" src="js/card.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
 

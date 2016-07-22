@@ -1,46 +1,7 @@
 
 
-.art-thumbnail {
-	
-	display: inline-block;
-	padding: 3px;
-	margin: 3px;
-	
-	background-color: white;
-	border-radius: 2px;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
-}
 
 
-.art-minithumbnail {
-	position: relative;
-	display: inline-block;
-	padding: 2px;
-	margin: 4px;
-	background-color: white;
-	border-radius: 2px;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
-	
-}
-
-.art-canvas {
-	background-color: white;
-	border-radius: 2px;
-	box-shadow: 1px 1px 2px 3px rgba(0, 100, 250, .4);
-}
-
-
-.art-thumbnail svg {
-	padding: 0px;
-	
-}
-
-.art-minithumbnail svg {
-	padding: 0px;
-	height: 70px;
-	width: 55px;
-
-}
 .colorswatch {
 	width: 20px;
 	height: 20px;
@@ -83,8 +44,11 @@
 	
 }
 
-.card .section-contents {
-	display: inline-block;
+.art-svg-data {
+	max-width: 100px;
+	max-height: 30px;
+	overflow: scroll;
+	font-size: 8px;
 }
 
 .art-code {
@@ -133,7 +97,7 @@
 
 .graph {
 	width: 100%;
-	height: 90px;
+	height: 50px;
 	background-color: hsla(40, 90%, 90%, 1);
 	flex-direction: row;
 	display: flex;

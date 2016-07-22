@@ -1,11 +1,11 @@
 .card {
 	display: inline-block;
 	border-radius: 5px;
-	margin: 7px;
+	margin: 3px;
 	min-width: 10px;
 	overflow: hidden;
-	
-	background-color: hsl(230, 20%, 80%);
+
+	background-color: hsl(40, 15%, 95%);
 	box-shadow: 1px 1px 2px rgba(0, 0, 0, .6);
 	text-align: center;
 	max-width: 650px;

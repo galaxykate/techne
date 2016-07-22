@@ -4,6 +4,7 @@
 
 function svgToCanvas(svgString, canvas, callback) {
 	var svg = $(svgString)[0];
+//console.log(svgString);
 	//console.log(typeof art.svg);
 	var serializer = new XMLSerializer(); //TODO: probably don't need to do this every time
 	//find a good place to store scoped objects

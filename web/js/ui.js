@@ -110,8 +110,8 @@ function sortAndDisplayArtistFavorites(artist, allArt, holder, graph) {
 			html: "&#9829;" + rating.toFixed(2)
 		}).appendTo(mini);
 
-if (graph)
-		createGraph(mini, art.hueDist);
+		if (graph)
+			createGraph(mini, art.hueDist);
 
 	});
 
@@ -342,7 +342,7 @@ function createArtistCard(holder, artist) {
 	}).appendTo(card.customControls).click(function() {
 		// reroll grammar
 
-var artCount = 20;
+		var artCount = 20;
 		var count = 0;
 		var bestGrammar = artist.grammar;
 		var bestScore = 0;
@@ -352,7 +352,7 @@ var artCount = 20;
 			createArt(artCount, function() {
 
 				var stats = sortAndDisplayOwnFavorites(artist);
-				console.log(count+  ": " + stats.avg)
+				console.log(count + ": " + stats.avg)
 				if (stats.avg > bestScore) {
 					bestGrammar = artist.artGrammars[0];
 					bestScore = stats.avg;
@@ -368,9 +368,9 @@ var artCount = 20;
 					var stats = sortAndDisplayOwnFavorites(artist);
 				});
 
-console.log("BEST: " + artist.artGrammars[0].id + " " + bestScore);
+				console.log("BEST: " + artist.artGrammars[0].id + " " + bestScore);
 			}
-		}, 200);
+		}, 600);
 
 
 	});
@@ -488,7 +488,7 @@ function createGraph(holder, buckets) {
 		max = Math.max(buckets[i], max);
 	}
 
-	max = 2;
+	
 
 	$.each(buckets, function(index, bucket) {
 		var pct = index / buckets.length;

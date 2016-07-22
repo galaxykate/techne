@@ -7,46 +7,16 @@ var sim = {
 
 };
 
-
 function clearSim() {
-	sim.artists = [];
-	sim.art = [];
-	sim.critics = [];
-	sim.critiques = [];
-	sim.preferenceGenerators = [];
 
 }
 
-// Create artist generators (schools)
-
-function createPreferenceGenerators(count) {
-	for (var i = 0; i < count; i++) {
-		//pulled out the random preference generator, put in the color preference generator
-		sim.preferenceGenerators.push(new ColorPreferenceGenerator());
-	}
+function createRandomBot(callback) {
+	return new Bot(callback);
 }
 
 
-function createCritics(count) {
-	for (var i = 0; i < count; i++) {
-		var generator = getRandom(sim.preferenceGenerators);
-		//set a color parameter here to make a critic that looks for a particular color
-		sim.critics.push(new Critic({
-			generator: generator
-		}));
-	}
-}
 
-
-function createArtists(count) {
-	for (var i = 0; i < count; i++) {
-
-		var preferenceGenerator = getRandom(sim.preferenceGenerators);
-		sim.artists.push(new Artist({
-			preferenceGenerator: preferenceGenerator
-		}));
-	}
-}
 
 // Each bot creates N arts, and calls back when finished
 function createArt(count, callback) {
@@ -60,10 +30,10 @@ function createArt(count, callback) {
 		finished++;
 		//console.log("finished art" + finished + "/" + artistCount * count);
 		if (finished === artistCount * count) {
-		//	console.log("Finished creating art ", createdArt);
+			//	console.log("Finished creating art ", createdArt);
 			sim.art = sim.art.concat(createdArt);
-		callback(createdArt);
-			}
+			callback(createdArt);
+		}
 	}
 
 	for (var i = 0; i < artistCount; i++) {

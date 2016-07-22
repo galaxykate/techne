@@ -1,7 +1,6 @@
 // Show a tree of nodes
 
 function UINode(node, holder) {
-	console.log("new node for " + node);
 	var uiNode = this;
 	this.node = node;
 	this.div = $("<div/>", {
@@ -11,68 +10,81 @@ function UINode(node, holder) {
 	if (node.hasMask) {
 
 	}
+
 	this.card = new Card(this.div, this, {
-		title: "node",
+		title: node.toString(),
 		classes: "tracery-node-maincard"
 	});
+	this.card.isOpen = true;
 
-	if (node.key) {
-		this.card.title.text(node.key);
-	} else {
-		this.card.title.text(node.finishedText);
-
+	this.card.onClose = function() {
+		console.log("close " + node);
+		uiNode.children.hide();
 	}
 
-	this.card.contents.hide();
-	
 
-	if (node.childRule) {
+	this.card.onOpen = function() {
+		console.log("open " + node);
+		uiNode.children.show();
+	}
+
+	this.card.div.hover(function() {
+		uiNode.card.details.show();
+	}, function() {
+		uiNode.card.details.hide();
+	});
+
+if (node.rules) {
+	this.seed = $("<div/>", {
+		html: node.seed,
+		class: "tracery-node-data"
+	}).appendTo(this.card.details).click(function() {
+		node.reroll();
+		$(this).html(node.seed);
+		// uiNode.rebuildChildren();
+	});
+
+	this.seedDetails = $("<div/>", {
+		html: (node.ruleIndex + 1) + "/" + node.rules.length,
+		class: "tracery-node-data"
+	}).appendTo(this.card.details);
+}
+
+	if (node.rule) {
 		this.rule = $("<div/>", {
-			text: node.childRule,
+			html: node.rule,
 			class: "node-rule card"
 		}).appendTo(this.div);
 	}
 
+	if (node.key) {
+		this.card.title.html(node.key);
+	} else {
+		this.card.title.html(node.text);
+
+	}
 
 	this.children = $("<div/>", {
 		class: "node-children"
-	}).appendTo(this.div).click(function() {
-		uiNode.toggleExpand();
-		return false;
-	});
+	}).appendTo(this.div);
+
+	this.card.title.hide();
+	this.card.details.hide();
+	this.card.contents.hide();
 
 
-	this.isExpanded = true;
-	this.toggleExpand();
+
+	this.expand();
 }
 
-UINode.prototype.toggleExpand = function(recursive) {
-	this.isExpanded = !this.isExpanded;
+UINode.prototype.expand = function() {
 	this.children.html("");
-	this.childrenNodes = [];
+	this.children.slideDown(200);
 
-	if (this.node.children) {
-		if (this.isExpanded || this.node.children.length === 1) {
-			for (var i = 0; i < this.node.children.length; i++) {
-				this.childrenNodes.push(new UINode(this.node.children[i], this.children));
-			}
-
-			this.children.removeClass("closed");
-		} else {
-			this.children.html(this.node.children.length + " subnodes");
-			this.children.addClass("closed");
-
-		}
-
-
-		if (recursive) {
-			for (var i = 0; i < this.childrenNodes.length; i++) {
-				this.childrenNodes[i].toggleExpand(true);
-			}
-		}
+	this.card.title.show();
+	for (var i = 0; i < this.node.children.length; i++) {
+		new UINode(this.node.children[i], this.children);
 	}
-
-
 
 }
 
@@ -116,7 +128,7 @@ GrammarView.prototype.createSymbolLine = function(key, val) {
 
 	$.each(val.rules, function(index, rule) {
 		var ruleBlock = $("<div/>", {
-			text: rule,
+			html: rule,
 			class: "tracery-grammar-rule",
 		}).appendTo(div.rules);
 	})
