@@ -15,8 +15,8 @@ function clearSim() {
 function createPreferenceGenerators(count) {
 	for (var i = 0; i < count; i++) {
 		//pulled out the random preference generator, put in the color preference generator
-		sim.preferenceGenerators.push(new EdgePreferenceGenerator());
-		//sim.preferenceGenerators.push(new ColorPreferenceGenerator());
+		//sim.preferenceGenerators.push(new EdgePreferenceGenerator());
+		sim.preferenceGenerators.push(new ColorPreferenceGenerator());
 	}
 }
 

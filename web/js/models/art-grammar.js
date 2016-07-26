@@ -209,8 +209,9 @@ var ArtGrammar = Class.extend({
 				if (count === 0) {
 					finished = true;
 				}
+
 				if (finished) {
-						grammar.bot.setFavoriteHue(true);
+					grammar.bot.setFavoriteHue(true);
 					callback(allArt);
 				}
 			});

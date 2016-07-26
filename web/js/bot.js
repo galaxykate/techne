@@ -13,7 +13,7 @@ var Bot = Class.extend({
 			this.dna[i] = Math.random();
 		}
 
-		this.favoriteHue = Math.floor(Math.random() * 360);
+		//this.favoriteHue = Math.floor(Math.random() * 360);
 		this.grammars = [];
 
 		var grammarCount = 1;
@@ -29,29 +29,67 @@ var Bot = Class.extend({
 				}
 			});
 
-
+			//just like bots having a set of grammars, bots also have a set of preferences
+			//TODO: the default is a single color preference.  More can be added in later
+			this.preferences = [new ColorPreference()];
 		}
 	},
 
 	setFavoriteHue: function(save) {
-		console.log("Save favorite");
+		console.log("Save favorite hue");
+		//save as a parameter here means "if we have a color preference, do not change it"
+		//so, if a bot doesn't have a color preference, it will get one after this function is called,
+		//regardless of the value of save
+
+		//find the bots color preference
+		var colorPreferenceIdx = -1;
+		for(var index = 0; index < this.preferences.length; index++){
+			if(this.preferences[index].name.includes("ColorPreference")){
+				colorPreferenceIdx = index;
+				break;
+			}
+		}
+
+		//if we don't want to save the old color preference, then make a new one
+		if (!save && colorPreferenceIdx > -1){
+			//this.favoriteHue = Math.floor(Math.random() * 360);
+			this.preferences[colorPreferenceIdx] = new ColorPreference();
+		}
+
+		//if we never had a color preference to begin with, WE HAVE ONE NOW
+		if(colorPreferenceIdx == -1){
+			this.preferences.push(new ColorPreference());
+			colorPreferenceIdx = this.preferences.length - 1;
+		}
+
+		//view the color preference
+		if(colorPreferenceIdx > -1){
+			$(".bot-view" + this.id + " .bot-colordot").css({
+				backgroundColor: "hsla(" + this.preferences[colorPreferenceIdx].preferredValue + ",90%,50%,1)"
+			});
+		}
+
+		//recalculate happiness now that we may have added a color preference
+		this.calculateHappiness();
+	},
+
+	calculateHappiness: function(){
 		var bot = this;
 		bot.happiness = 0;
-		if (!save)
-		this.favoriteHue = Math.floor(Math.random() * 360);
-		$(".bot-view" + this.id + " .bot-colordot").css({
-			backgroundColor: "hsla(" + this.favoriteHue + ",90%,50%,1)"
-
-		});
-
 		$.each(this.grammars, function(index, grammar) {
 			$.each(grammar.art, function(index, art) {
-				var qual = art.getQualityFor(bot.favoriteHue);
+				//Each art quality is an unweighted average of score results
+				var qual = 0;
+				bot.preferences.forEach(function(preference){
+					qual += preference.apply(art); //TODO handle when we try to apply a preference that isn't applicable for this art
+				});
+				qual = qual / Math.max(bot.preferences.length, 1); //FIXME defense.  Prevents a bot that has no preferences from evaluating art as NaN
+				//var qual = art.getQualityFor(bot.favoriteHue);
 				bot.happiness += qual;
 			});
 		});
 		bot.happiness *= 0.07;
-		console.log(bot.happiness);
+		console.log(this.id + " bot is " + bot.happiness + " happy");
 		$(".bot-view" + this.id + " .bot-happiness").html(bot.happiness.toFixed(2) + evalToEmoji(bot.happiness));
 	},
 
@@ -181,7 +219,8 @@ var Bot = Class.extend({
 		var criticHolder = $("<div/>", {
 			class: "bot-criticholder"
 		}).appendTo(botView);
-		this.setFavoriteHue();
+
+		this.setFavoriteHue(true);
 	}
 
 });

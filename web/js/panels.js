@@ -28,15 +28,14 @@ $(document).ready(function() {
 		createRandomBot(function(bot) {
 			selectBot(bot);
 		});
-
 	});
 
 	$("#bot-panel-rerollart").click(function() {
 
 
 	});
-console.log("ready");
-		console.log("Create " + botsPerSim + " bots"); 
+	console.log("ready");
+	console.log("Create " + botsPerSim + " bots");
 	for (var i = 0; i < botsPerSim; i++) {
 		createRandomBot(function(bot) {
 
@@ -65,7 +64,7 @@ function selectBot(bot) {
 	$("#bot-panel-thumbnail").html(bot.toSVGPortrait());
 	$("#bot-panel-name").html(bot.name);
 
-$(".bot-view").removeClass("selected");
+	$(".bot-view").removeClass("selected");
 	$(".bot-view" + bot.id).addClass("selected");
 
 	// View the art generators

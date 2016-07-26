@@ -12,7 +12,13 @@ var Artist = Class.extend({
 		this.artGrammars = [];
 		this.artGrammars.push(new ArtGrammar());
 
-		this.favoriteHue = Math.random();
+		//artists have 1 or more preferences.  default is a hue preference
+		if(settings.preferences){
+			this.preferences = settings.preferences;
+		}else{
+			this.preferences = [new ColorPreference()];
+		}
+
 		this.art = [];
 	},
 
@@ -42,11 +48,11 @@ var Artist = Class.extend({
 	},
 
 	evaluateArt: function(art) {
-		var bucketCount = art.hueDist.length;
-		var favBucket = Math.floor((this.favoriteHue) * bucketCount);
-		rating = art.hueDist[favBucket] * bucketCount;
-		return rating;
-
+		var scoreSum = 0;
+		this.preferences.forEach(function(preference){
+			scoreSum = preference.apply(art);
+		});
+		return scoreSum / this.preferences.length;
 	},
 
 	toString: function() {
