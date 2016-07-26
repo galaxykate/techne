@@ -13,9 +13,7 @@ var Artist = Class.extend({
 		this.artGrammars.push(new ArtGrammar());
 
 		this.favoriteHue = Math.random();
-
 		this.art = [];
-
 	},
 
 

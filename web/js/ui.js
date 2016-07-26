@@ -36,9 +36,9 @@ var modes = {
 			clearSim();
 			createPreferenceGenerators(1);
 
-			createCritics(8);
+			createCritics(2);
 
-			createArtists(3);
+			createArtists(1);
 			createArt(8, function() {
 				critiqueAll();
 
@@ -49,24 +49,39 @@ var modes = {
 					art.renderToPixels(function() {
 						createArtCard(ui.mainHolder, art);
 					});
+				});
 
+				$.each(sim.critics, function(index, critic){
+					sortAndDisplayCriticFavorites(critic, critic.critiques, critic.card.contents);
 				});
 			});
-
-
 		},
 	}
 };
-
-
 
 /*
  * User selections and highlights
  */
 function sortAndDisplayOwnFavorites(artist) {
-	return sortAndDisplayArtistFavorites(artist, artist.art, artist.card.contents);
+	return sortAndDisplayArtistFavorites(artist, artist.art, artist.card.contents, true);
 }
 
+function sortAndDisplayCriticFavorites(critic, allCrits, holder, graph){
+	holder.html("");
+
+	var ratedArt = allCrits.map(function(crit){
+
+		return {
+			art: crit.art,
+			rating: crit.evaluation
+		};
+	});
+	ratedArt.sort(function(a, b) {
+		return b.rating - a.rating;
+	});
+
+	displaySortedArt(ratedArt, holder, graph);
+}
 function sortAndDisplayArtistFavorites(artist, allArt, holder, graph) {
 	holder.html("");
 
@@ -84,7 +99,10 @@ function sortAndDisplayArtistFavorites(artist, allArt, holder, graph) {
 	ratedArt.sort(function(a, b) {
 		return b.rating - a.rating;
 	});
+	displaySortedArt(ratedArt, holder, graph);
+}
 
+function displaySortedArt(ratedArt, holder, graph){
 	var total = 0;
 	var stats = $("<div/>", {
 		class: "stats",
@@ -101,8 +119,8 @@ function sortAndDisplayArtistFavorites(artist, allArt, holder, graph) {
 		}).appendTo(holder);
 
 		var thumb = art.image.clone().css({
-			width: art.size.x * .7,
-			height: art.size.y * .7
+			width: art.size.x * 0.7,
+			height: art.size.y * 0.7
 		}).appendTo(mini);
 
 		var miniRating = $("<div/>", {
@@ -110,8 +128,9 @@ function sortAndDisplayArtistFavorites(artist, allArt, holder, graph) {
 			html: "&#9829;" + rating.toFixed(2)
 		}).appendTo(mini);
 
-		if (graph)
-			createGraph(mini, art.hueDist);
+		if (graph){
+			createGraph(mini, art.contrastDist);
+		}
 
 	});
 
@@ -134,8 +153,6 @@ function selectArt(art) {
 	$(".card-art" + art.id).addClass("selected");
 	ui.selectedArt = art;
 }
-
-
 
 /*
  * Create cards for individual art
@@ -226,21 +243,23 @@ function createArtCard(holder, art) {
 
 			for (var i = 0; i < art.calculations.length; i++) {
 				var val = art.calculations[i];
-				var c = new KColor(val * .7 + .8, 1.2 - .6 * val, .5 + .5 * val);
+				if(i == 0){
+					//scale the contrast score back to [0,1]
+					val = linearScale([0, 21], [0, 1], val);
+				}
+				//probably something smart to do with edginess, but meh.
+				var c = new KColor(val * 0.7 + 0.8, 1.2 - 0.6 * val, 0.5 + 0.5 * val);
 
 				$("<div/>", {
 					class: "art-calculationswatch",
-					html: val.toFixed(2)
+					html: art.calculations[i].toFixed(2)
 				}).appendTo(card.artCalculations).css({
 
-					color: c.toCSS(-.5, 0),
-					backgroundColor: c.toCSS(.2, 0)
+					color: c.toCSS(-0.5, 0),
+					backgroundColor: c.toCSS(0.2, 0)
 				});
 
 			}
-
-
-
 		}
 
 		function updateCritiqueUI() {
@@ -274,8 +293,6 @@ function createArtCard(holder, art) {
 
 	}
 
-
-
 	//card.contents.html("foo");
 	ui.cards.push(card);
 
@@ -288,12 +305,32 @@ function createCriticCard(holder, critic) {
 		hideDetails: true,
 	});
 
-	var hue = critic.preference.favoriteHue;
-	card.favoriteColor = $("<div/>", {
-		class: "card-info",
-		html: "favorite hue: <span STYLE='font-weight:bold;color:hsl(" + hue + ",90%,70%);background:hsl(" + hue + ",90%,30%)'>" + hue.toFixed(2) + "</span>"
-	}).appendTo(card.contents);
-
+	//we have a few different types of critics, which changes how we showcase critics and art and stuff
+	if(critic.preference.name.includes("ColorPreference")){
+		var hue = critic.preference.preferredValue * 360;
+		console.log("Trying to display preferred hue ", hue);
+		card.favoriteColor = $("<div/>", {
+			class: "card-info",
+			html: "favorite hue: <span STYLE='font-weight:bold;color:hsl(" + hue + ",90%,70%);background:hsl(" + hue + ",90%,30%)'>" + hue.toFixed(2) + "</span>"
+		}).appendTo(card.title);
+	}
+	if(critic.preference.name.includes("ContrastPreference")){
+		var contrast = critic.preference.preferredValue;
+		console.log("Trying to display preferred contrast: ", contrast);
+		card.favoriteContrast = $("<div/>", {
+			class: "card-info",
+			html: "favorite contrast ratio: <span STYLE='font-weight:bold'>" + contrast.toFixed(2) + "</span>"
+		}).appendTo(card.title);
+	}
+	if(critic.preference.name.includes("EdgePreference")){
+		var edginess = critic.preference.preferredValue;
+		console.log("Trying to display preferred edginess: ", edginess);
+		card.favoriteContrast = $("<div/>", {
+			class: "card-info",
+			html: "favorite edginess: <span STYLE='font-weight:bold'>" + edginess.toFixed(2) + "</span>"
+		}).appendTo(card.title);
+	}
+	critic.card = card;
 
 	ui.cards.push(card);
 
@@ -327,7 +364,7 @@ function createArtistCard(holder, artist) {
 
 	function setSwatchColor() {
 		card.favColor.css({
-			backgroundColor: toCSSHSLA(artist.favoriteHue, 1, .5, 1)
+			backgroundColor: toCSSHSLA(artist.favoriteHue, 1, 0.5, 1)
 		});
 	}
 	setSwatchColor();
@@ -353,10 +390,11 @@ function createArtistCard(holder, artist) {
 
 				var stats = sortAndDisplayOwnFavorites(artist);
 				console.log(count + ": " + stats.avg)
+
 				if (stats.avg > bestScore) {
 					bestGrammar = artist.artGrammars[0];
 					bestScore = stats.avg;
-					console.log("NEW BEST " + count + ": " + stats.avg)
+					console.log("NEW BEST " + count + ": " + stats.avg);
 				}
 				count++;
 			});
@@ -488,21 +526,21 @@ function createGraph(holder, buckets) {
 		max = Math.max(buckets[i], max);
 	}
 
-	
+
 
 	$.each(buckets, function(index, bucket) {
 		var pct = index / buckets.length;
 		var barHolder = $("<div/>", {
 			class: "graph-barholder"
 		}).appendTo(graph).css({
-			backgroundColor: toCSSHSLA(pct, .3, .2, 1)
+			backgroundColor: toCSSHSLA(pct, 0.3, 0.2, 1)
 		});
 
 		var barFill = $("<div/>", {
 			class: "graph-barfill"
 		}).appendTo(barHolder).css({
 			height: (bucket * 100 / max) + "%",
-			backgroundColor: toCSSHSLA(pct, 1, .6, 1)
+			backgroundColor: toCSSHSLA(pct, 1, 0.6, 1)
 		});
 
 	});

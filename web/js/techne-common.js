@@ -2,10 +2,9 @@
 //may be some duplication between this and common.js, I just got very afraid of
 //common.js.
 
-//Sorry, Kate.
 
 //library of useful functions to share across various modules
-
+var edgeDetectionKernel = [0, -1, 0, -1, 4, -1, 0, -1, 0];
 /**
  * Convert RGB to a hex string
  * @param  {Number} r red code
@@ -59,46 +58,116 @@ function createImg(){
 }
 
 /**
- * Convert a color in rgb to hsv
- * @param  {Object} rgb an rgb color object with r,g and b parameters
- * @return {Object}     an hsv color object with hue, sat and value parameters
+ * Scale a value from a domain to a range
+ * @param  {Array} domain [min, max] of domain
+ * @param  {Array} range  [min, max] if range
+ * @param  {Number} value  value to scale
+ * @return {Number}        scaled value
  */
-function rgbTohsv(rgb){
-  var rr, gg, bb, h, s;
-  var r = rgb.r / 255;
-  var g = rgb.b / 255;
-  var b = rgb.g / 255;
-  var v = Math.max(r, g, b);
-  var diff = v - Math.min(r, g, b);
-  var diffc = function(c){
-          return (v - c) / 6 / diff + 1 / 2;
-        };
+function linearScale(domain, range, value){
+  return (((range[1] - range[0]) * (value - domain[0])) / (domain[1] - domain[0])) + range[0];
+}
 
-  if (diff === 0) {
-    h = s = 0;
-  } else {
-    s = diff / v;
-    rr = diffc(r);
-    gg = diffc(g);
-    bb = diffc(b);
+/*=======================================================================
+PIXEL PROCESSING FUNCTIONS
+=========================================================================*/
+/**
+ * Get a contrast ratio for a chunk of pixels
+ * @param  {array} pixels pixel data
+ * @return {Number}       a contrast ratio for these pixels!
+ */
+function getContrastRatio(pixels){
+  //convert a pixel array to a set of relative lumanescence scores to use for contrast comparisons
+  //https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+  var rgbWeights = [0.2126, 0.7152, 0.0722];
+  var lumas = [];
 
-    if (r === v) {
-      h = bb - gg;
-    }else if (g === v) {
-      h = (1 / 3) + rr - bb;
-    }else if (b === v) {
-      h = (2 / 3) + gg - rr;
+  //right now, we're windowing over the whole art.
+  for(let i = 0; i < pixels.length; i+=4){
+    var rgbIntensities = [pixels[i] / 255, pixels[i+1] / 255, pixels[i+2] / 255];
+    var luminescences = [];
+
+    for(var j = 0; j < rgbIntensities.length; j++){
+      var colorIntensity = rgbIntensities[j];
+      if(colorIntensity <= 0.03928){
+        luminescences.push(colorIntensity / 12.92);
+      }else{
+        luminescences.push(Math.pow((colorIntensity+0.055) / 1.055, 2.4));
+      }
     }
-    if (h < 0) {
-      h += 1;
-    }else if (h > 1) {
-      h -= 1;
+    lumas.push((rgbWeights[0] * luminescences[0]) +
+              (rgbWeights[1] * luminescences[1]) +
+              (rgbWeights[2] * luminescences[2]));
+  }
+
+  //find the max and min relative lumanescence
+  var maxIntensity = 0;
+  var minIntensity = Number.MAX_VALUE;
+
+  for(let i = 0; i < lumas.length; i++){
+    if(lumas[i] > maxIntensity){
+      maxIntensity = lumas[i];
+    }
+
+    if(lumas[i] < minIntensity){
+      minIntensity = lumas[i];
     }
   }
 
-  return {
-    hue: Math.round(h * 360),
-    sat: Math.round(s * 100),
-    value: Math.round(v * 100)
-  };
+  //finally, calculate the contrast ratio of the art
+  //Again, from https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+  var contrastRatio = ((maxIntensity + 0.05) / (minIntensity + 0.05));
+
+  //console.log("Calculated contrast ratio: ", contrastRatio);
+  return contrastRatio;
+}
+
+/**
+ * Get a pixel at a particular x/y location in an image of a particular
+ * width/height.  Assumes rgba pixels
+ * @param  {Array} pixels image pixels
+ * @param  {Number} w      width
+ * @param  {Number} h      image height
+ * @param  {Number} x      x-location
+ * @param  {Number} y      y-location
+ * @return {Array}        pixel data for that location
+ */
+function getPixel(pixels, w, h, x, y){
+   var idx = (x + y * w) * 4;
+   return [pixels[idx], pixels[idx+1], pixels[idx+2], pixels[idx+3]];
+}
+
+/**
+ * Apply a provided kernel to a bunch of pixels
+ * @param  {Array} pixels pixel data (in rgba)
+ * @param  {Array} kernel kernel to apply to these pixels
+ * @return {Number}        new set of pixel data / result from kernel application
+ */
+function applyKernel(pixels, kernel){
+  if(pixels.length != kernel.length * 4){
+    console.log("Num pixels: ", pixels.length / 4);
+    console.log("Num kernel components: ", kernel.length);
+    throw "Invalid kernel op!  Lengths seperate.";
+  }
+
+  var packedPixels = [];
+  for(let i = 0; i < pixels.length; i+=4){
+    //pack the pixel into a single number to do math with
+    var pixNum = (pixels[i] << 16) + (pixels[i+1] << 8) + pixels[i+2];
+    packedPixels.push(pixNum);
+  }
+
+  if(packedPixels.length != kernel.length){
+    console.log("Packed pixel length: ", packedPixels.length);
+    console.log("Kernel length: ", kernel.length);
+    throw "Pixel packing fucked up somewhere, kernel is not the same length as packed pixels!";
+  }
+
+  var appliedValues = packedPixels.map(function(val, idx){
+    return val * kernel[idx];
+  });
+
+  return appliedValues.reduce(function(sum, val, idx){
+    return sum + val;
+  });
 }

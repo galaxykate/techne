@@ -102,20 +102,19 @@ var ArtGrammar = Class.extend({
 			var strokeWeight = getRandom(["stroke-width='#lowDigit#' ", "stroke-width='#lowDigit#' ", "stroke-width='#highDigit#' "]);
 			var strokeColor = getRandom(["stroke='hsl(#hue#,100%,#highDigit#0%)' "]);
 			var strokeOpacity = getRandom(["stroke-opacity='0.#midDigit#'  ", "stroke-opacity='0.#highDigit#'  "]);
-			if (Math.random() > .5) {
+			if (Math.random() > 0.5) {
 				myStyles.push(color + opacity);
 
 			} else
 				myStyles.push(color + opacity + strokeWeight + strokeColor + strokeOpacity);
 
 		}
-			this.addCustomSymbol("hue", [Math.floor(Math.random() * 360) + "", Math.floor(Math.random() * 360) + ""]);
+		this.addCustomSymbol("hue", [Math.floor(Math.random() * 360) + "", Math.floor(Math.random() * 360) + ""]);
 		this.addCustomSymbol("pathPoint", myPts);
-	this.addCustomSymbol("shape", myShapes);
+		this.addCustomSymbol("shape", myShapes);
 		this.addCustomSymbol("style", myStyles);
 		pathPoint:
 			this.updateGrammar();
-
 	},
 
 	addCustomSymbol: function(key, rules) {
@@ -130,7 +129,7 @@ var ArtGrammar = Class.extend({
 					text: rule,
 					origin: grammar,
 					isDeleted: false,
-				}
+				};
 			})
 		};
 	},
@@ -218,8 +217,8 @@ var ArtGrammar = Class.extend({
 
 
 		}
-		
-	
+
+
 	},
 
 	generate: function() {
@@ -254,7 +253,7 @@ var ArtGrammar = Class.extend({
 					html: escapeHtml(rule.text)
 				}).appendTo(rulesHolder).css({
 					backgroundColor: grammarIDtoOutlineColor(rule.origin.id)
-				})
+				});
 
 				if (rule.isDeleted) {
 					ruleDiv.addClass("deleted").append("<div class='strikethrough'></div>");
@@ -353,9 +352,9 @@ var ArtGrammar = Class.extend({
 function ruleIsInArray(rules, rule) {
 	var found = rules.filter(function(r2) {
 		return r2.text === rule.text;
-	})
+	});
 }
 
 function grammarIDtoOutlineColor(id) {
-	return "hsla(" + (id * 44.9) % 360 + ",90%, 70%, 1)"
+	return "hsla(" + (id * 44.9) % 360 + ",90%, 70%, 1)";
 }
