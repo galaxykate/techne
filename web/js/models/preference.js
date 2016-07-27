@@ -2,7 +2,6 @@
 //
 //Preferences expect that the object they're being told to evaluate contains the
 //a parameter that maps with what they're looking for.
-//Prefrences work in the [0, 1] range, with 0 being abject hatred and 1 being love
 //@Author: Johnathan Pagnutti
 var preferenceCount = 0;
 
@@ -22,6 +21,7 @@ var Preference = Class.extend({
 
     this.id = preferenceCount++;
     this.name = "Preference" + this.id;
+    this.weight = 1; //how much weight to give this preference
   },
 
   /**

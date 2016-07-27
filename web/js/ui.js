@@ -148,11 +148,13 @@ function selectCritic(critic) {
 	ui.selectedCritic = critic;
 }
 
+/*
 function selectArt(art) {
 	$(".card-art").removeClass("selected");
 	$(".card-art" + art.id).addClass("selected");
 	ui.selectedArt = art;
 }
+*/
 
 /*
  * Create cards for individual art

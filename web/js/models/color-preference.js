@@ -20,7 +20,7 @@ var ColorPreference = Preference.extend({
     //art _should_ have already calculated any metrics that require it's pixel data
     //art also has the scoring functions bundled with
     if(art.hueDist && art.getQualityFor){
-      return art.getQualityFor(this.preferredValue);
+      return this.weight * art.getQualityFor(this.preferredValue);
     }else{
       //TODO: I feel like, as part of Techne, we can't assume that any art
       //another bot has actually has the pre-calculated information we'd like it

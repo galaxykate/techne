@@ -30,7 +30,6 @@ var Bot = Class.extend({
 			});
 
 			//just like bots having a set of grammars, bots also have a set of preferences
-			//TODO: the default is a single color preference.  More can be added in later
 			this.preferences = [new ColorPreference()];
 		}
 	},
@@ -78,12 +77,13 @@ var Bot = Class.extend({
 		bot.happiness = 0;
 		$.each(this.grammars, function(index, grammar) {
 			$.each(grammar.art, function(index, art) {
-				//Each art quality is an unweighted average of score results
+				//Each art quality is a weighted linear combination of applying
+				//each of the bot's preferences to the art at hand
+				//(weights are wrapped up in the preference object)
 				var qual = 0;
 				bot.preferences.forEach(function(preference){
 					qual += preference.apply(art); //TODO handle when we try to apply a preference that isn't applicable for this art
 				});
-				qual = qual / Math.max(bot.preferences.length, 1); //FIXME defense.  Prevents a bot that has no preferences from evaluating art as NaN
 				//var qual = art.getQualityFor(bot.favoriteHue);
 				bot.happiness += qual;
 			});
@@ -175,6 +175,7 @@ var Bot = Class.extend({
 
 		var bot = this;
 		var grammar = this;
+
 		var hue = (this.id * 39.58) % 360;
 		var botView = $("<div/>", {
 			class: "card bot-view bot-view" + this.id
@@ -200,17 +201,30 @@ var Bot = Class.extend({
 
 		var favColor = $("<div/>", {
 			class: "data bot-colordot",
-
 		}).appendTo(favColorHolder).click(function() {
 			bot.setFavoriteHue();
 			return false;
-
 		});
 
-			var happinessHolder = $("<div/>", {
+		/*
+		var favContrastHolder = $("<div/>", {
+			class: "bot-contrastholder",
+			html: "favorite contrast score "
+		}).appendTo(botView);
+
+		var favContrast = $("<div/>", {
+			class: "data bot-contrastscore"
+		}).appendTo(favContrastHolder).click(function(){
+			bot.setFavoriteContrast();
+			return false;
+		});
+		*/
+
+		var happinessHolder = $("<div/>", {
 			class: "bot-happinessholder",
 			html: "happiness: ",
 		}).appendTo(botView);
+
 
 		var happiness = $("<div/>", {
 			class: "data bot-happiness",

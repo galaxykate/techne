@@ -34,7 +34,7 @@ z-index: 60;
 .column {
 	position: relative;
 	flex: 0 0;
-	
+
 }
 
 .selected {
@@ -42,7 +42,7 @@ z-index: 60;
 }
 
 .bot-thumbnail {
-	background-color: hsl(240, 90%,40%);
+	/*background-color: hsl(240, 90%,40%);*/
 	width: 100px;
 	height: 100px;
 }
@@ -55,9 +55,15 @@ z-index: 60;
 #critique-panel {
 	top: 0px;
 	left: 450px;
-	width: 400px;
-	height: 200px;
+	width: 300px;
+	height: 350px;
 }
+
+#critique-panel-crits {
+	height:auto;
+	width:150px;
+}
+
 #generator-panel {
 	top: 200px;
 	left: 450px;
@@ -76,7 +82,7 @@ z-index: 60;
 	padding: 3px;
 	margin: 3px;
 	background-color: hsla(240, 90%,40%, .5);
-	
+
 }
 .grammar-view-symbol {
 	margin: 2px;
@@ -109,7 +115,7 @@ background-color: hsla(40, 10%,90%, .5);
 
 
 #bot-artview-column {
-	
+
 	width: 640px;
 }
 

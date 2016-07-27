@@ -4,7 +4,7 @@ var sim = {
 	critics: [],
 	critiques: [],
 	preferenceGenerators: [],
-
+	preferences: []
 };
 
 function clearSim() {
@@ -24,7 +24,12 @@ function createRandomBot(callback) {
 	return new Bot(callback);
 }
 
-
+function loadCritPreferences(){
+	sim.preferences = {};
+	sim.preferences.ColorPreference = new ColorPreference();
+	sim.preferences.EdgePreference = new EdgePreference();
+	sim.preferences.ContrastPreference = new ContrastPreference();
+}
 
 
 // Each bot creates N arts, and calls back when finished

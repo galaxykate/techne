@@ -18,7 +18,7 @@ var EdgePreference = Preference.extend({
       console.log(art.id + ": " + art.edgeScore, this.name + ": " + this.preferredValue, edgeDiff);
 
       //the smaller this difference gets, the more positive we want to rate the art
-      return 1 / Math.abs(edgeDiff);
+      return this.weight * (1 / Math.abs(edgeDiff));
     }else{
       //TODO: art doesn't have an edge score, so we can't deal with it.  It's
       //not beyond the pale to think that we might want to have a 'fallback'

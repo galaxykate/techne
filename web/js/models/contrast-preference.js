@@ -21,7 +21,7 @@ var ContrastPreference = Preference.extend({
       //get a distance
       var distance = art.contrastScore - this.preferredValue;
       //flip this, such that higher numbers mean we like the art more
-      return 1 / (Math.abs(distance));
+      return this.weight * (1 / (Math.abs(distance)));
     }else{
       //TODO: it's not beyond the pale to want to see if we can calculate an art's contrast score right now.
       this.handleUnableToEvaluate();

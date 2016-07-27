@@ -243,8 +243,6 @@ var Art = Class.extend({
 		function drawPixelData() {
 			//artDebugInfo.append(art.image);
 
-
-
 			// Draw pixels
 			var spacing = 55;
 			var w = art.size.x;
@@ -268,11 +266,9 @@ var Art = Class.extend({
 					backgroundColor: "rgb(" + r + "," + g + "," + b + ")"
 				});
 			}
-
-
-
 		}
 
+		/*
 		function updateCritiqueUI() {
 			// Make dots for each critique
 			var critiques = getCritsFor(art);
@@ -288,6 +284,7 @@ var Art = Class.extend({
 				});
 			});
 		}
+		*/
 		// Is the pixel data set yet?
 		if (!art.pixelData) {
 			console.log("load pixel data");
@@ -298,7 +295,8 @@ var Art = Class.extend({
 		} else {
 			console.log("pixel data already loaded");
 			drawPixelData();
-			updateCritiqueUI();
+			//updateCritiqueUI();
 		}
 	}
+
 });
