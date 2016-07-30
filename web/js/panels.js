@@ -31,7 +31,8 @@ $(document).ready(function() {
 	});
 
 	$("#bot-panel-rerollart").click(function() {
-
+		// reroll this bot's art
+		//sim.selectedBot
 
 	});
 
@@ -128,7 +129,7 @@ function selectGrammar(grammar) {
 
 function selectBot(bot) {
 	console.log("select " + bot);
-	sim.selectedGrammar = bot;
+	sim.selectedBot = bot;
 	// Fill out the bot inspector info
 	$("#bot-panel-thumbnail").html(bot.toSVGPortrait());
 	$("#bot-panel-name").html(bot.name);

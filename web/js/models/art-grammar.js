@@ -1,7 +1,5 @@
 // Create an art grammar that can generate images
-
 var grammarCount = 0;
-
 
 function createDefaultGrammar(size) {
 	var w = size.x;
@@ -141,19 +139,17 @@ var ArtGrammar = Class.extend({
 	},
 	// Create the grammar that can actually manufacture art
 	toTraceryGrammar: function() {
-		var raw = jQuery.extend({}, defaultGrammar);
+		var raw = jQuery.extend({}, defaultGrammar); //copy the default grammar
 
-		$.each(this.customSymbols, function(key, symbol) {
+		$.each(this.customSymbols, function(key, symbol) { //add in any not deleted rules
 			var validRules = [];
 			for (var i = 0; i < symbol.rules.length; i++) {
 				if (!symbol.rules[i].isDeleted)
 					validRules.push(symbol.rules[i].text);
 			}
 			raw[key] = validRules;
-
-
 		});
-		return new TraceryGrammar(raw);
+		return new TraceryGrammar(raw); //wrap the result in an object and return
 	},
 
 	prune: function() {
@@ -173,6 +169,72 @@ var ArtGrammar = Class.extend({
 		this.updateGrammar();
 	},
 
+	pruneForFunction: function(evalBot, possibleGrammarsToConsider, artNum, finalCallback){
+			//memorize what the current state of the custom symbols in the grammar is
+			var originalSymbols = jQuery.extend(true, {}, this.customSymbols);
+			var donePotentialGrammars = function(grammar, potentialGrammars){
+				var highScore = 0;
+				var highIdx = -1;
+				for(var i = 0; i < potentialGrammars.length; i++){
+					if(potentialGrammars[i].score >= highScore){
+						highScore = potentialGrammars[i].score;
+						highIdx = i;
+					}
+				}
+				console.log("Score comp before we ruin everything:");
+				console.log(grammar.bot.happiness, potentialGrammars[highIdx].score);
+				if(grammar.bot.happiness > potentialGrammars[highIdx].score){
+					//DO NOT DO THE THING
+					console.log("can't find a way to make us happier.  Not gonna prune.");
+					grammar.customSymbols = originalSymbols;
+				}else{
+					grammar.customSymbols = potentialGrammars[highIdx].symbols;
+				}
+
+				grammar.updateGrammar();
+				finalCallback(grammar);
+			};
+			var potentialGrammars = this.buildOutPossibleGrammars([], originalSymbols, evalBot, possibleGrammarsToConsider, artNum, donePotentialGrammars);
+	},
+
+	//recursively prune and score potential grammars until we've got possibleGrammarsToConsider grammars
+	buildOutPossibleGrammars: function(potentialGrammars, originalSymbols, evalBot, possibleGrammarsToConsider, artNum, finalCallback){
+			var grammar = this;
+			if(potentialGrammars.length == possibleGrammarsToConsider){
+				finalCallback(grammar, potentialGrammars);
+				return;
+			}
+			this.prune();
+
+			var count = artNum;
+			var finished = false;
+			var allArt = [];
+
+			var makeMultipleArtCallback = function (art){
+				allArt.push(art);
+				count--;
+				if(count === 0){
+					finished = true;
+				}
+				if(finished){
+					console.log(allArt);
+					var grammarScore = 0;
+					allArt.forEach(function(art){
+						grammarScore += evalBot.evalSingleArt(art);
+					});
+					grammarScore *= 0.07;
+					potentialGrammars.push({
+						score: grammarScore,
+						symbols: $.extend(true, {}, grammar.customSymbols)
+					});
+					grammar.customSymbols = $.extend(true, {}, originalSymbols);
+					grammar.buildOutPossibleGrammars(potentialGrammars, originalSymbols, evalBot, possibleGrammarsToConsider, artNum, finalCallback);
+				}else{
+					new Art(grammar, {}, makeMultipleArtCallback);
+				}
+			};
+			new Art(this, {}, makeMultipleArtCallback);
+	},
 
 	learnFrom: function(g2) {
 		var counts = {};
@@ -185,8 +247,6 @@ var ArtGrammar = Class.extend({
 				return !rule.isDeleted && !ruleIsInArray(rules1, rule);
 			});
 
-
-
 			var toAdd = getRandom(rules2);
 			rules1.push(toAdd);
 
@@ -195,7 +255,7 @@ var ArtGrammar = Class.extend({
 	},
 
 
-	createArt(callback) {
+	createArt: function(callback) {
 		var count = this.artCount;
 		var grammar = this;
 		var finished = false;
@@ -215,20 +275,13 @@ var ArtGrammar = Class.extend({
 					callback(allArt);
 				}
 			});
-
-
 		}
-
-
 	},
 
 	generate: function() {
-
+		//console.log(this.grammar.raw.shape);
 		var tree = this.grammar.expand("#art#");
-
-
 		return tree;
-
 	},
 
 	refreshView: function() {
@@ -313,14 +366,14 @@ var ArtGrammar = Class.extend({
 		var pruneButton = $("<button/>", {
 			html: "prune"
 		}).click(function() {
-			grammar.prune();
-			grammar.art = [];
-			grammar.createArt(function() {
-				grammar.refreshArtView();
-				grammar.refreshView();
-			});
-
-
+			var finalCallback = function(grammar){
+				grammar.art = [];
+				grammar.createArt(function() {
+					grammar.refreshArtView();
+					grammar.refreshView();
+				});
+			};
+			grammar.pruneForFunction(grammar.bot, 5, 5, finalCallback);
 		}).appendTo(grammarView);
 
 

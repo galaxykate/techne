@@ -93,6 +93,15 @@ var Bot = Class.extend({
 		$(".bot-view" + this.id + " .bot-happiness").html(bot.happiness.toFixed(2) + evalToEmoji(bot.happiness));
 	},
 
+	//evaluate a single art
+	evalSingleArt: function(art){
+		var qual = 0;
+		this.preferences.forEach(function(preference){
+			qual += preference.apply(art);
+		});
+		return qual;
+	},
+
 	toSVGPortrait: function() {
 		var headR = portraitSize * 0.36;
 		var r0 = headR * (0.7 - 0.4 * this.dna[9]);
