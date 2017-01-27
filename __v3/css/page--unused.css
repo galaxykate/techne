@@ -1,0 +1,98 @@
+body {
+	 background-image: url("img/retina_wood.png");
+   
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height: 100%;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+
+}
+
+#main {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.section {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+}
+
+.section-header {
+	position: relative;
+	
+	flex: 0 1;
+	width: 100%;
+	min-height: 20px;
+	display: inline-flex;
+	flex-direction: row;
+box-shadow: 0px 1px 3px rgba(30, 0, 0, .5);
+	
+}
+
+.section-title {
+	position: relative;
+	min-height: 15px;
+	padding: 2px 4px;
+	flex: 1 1;
+	
+}
+
+.section-controls {
+	position: relative;
+	
+	min-height: 15px;
+	padding: 2px 4px;
+	flex: 0 1;
+		text-align: right;
+	
+}
+
+.section-control-subsection {
+	display: inline-block;
+	font-size: 8px;
+}
+
+
+
+.section-contents {
+	width: 100%;
+	position: relative;
+	flex: 1 1;
+	padding: 3px;
+		display: inline-flex;
+		overflow-y: scroll;
+		overflow-x: hidden;
+}
+
+#main-columns {
+	flex: 1;
+	max-width: 900px;
+	position: relative;
+	margin: 0px auto;
+	background-color:hsla(20, 10%, 96%, 1);
+	box-shadow: 0px 2px 6px rgba(0, 0, 0, .4);
+	height: 100%;
+
+	display: inline-flex;
+	flex-direction: row;
+}
+
+.main-col {
+	flex: 1;
+}
+
+#left-col {
+		max-width: 250px;
+
+}
+
+#right-col {
+	
+}

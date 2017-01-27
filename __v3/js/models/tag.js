@@ -6,10 +6,11 @@
  */
  var mongoose  = require('mongoose');
  var Schema    = mongoose.Schema;
- 
+var lib        = require('../modules/commonlib');
+
  var TagSchema = new Schema({
-   key: String,
-   value: String
+   key: {type: String},
+   value: {type: String }
  });
 
- module.exports = mongoose.model('Tag', TagSchema);
+module.exports = lib.exportModel(mongoose, 'Tag', TagSchema);

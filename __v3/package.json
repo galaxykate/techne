@@ -4,8 +4,16 @@
   "description": "A semi-autonimous art bot commune that learns new techniques from each other!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "webpack && ./node_modules/.bin/jasmine ./test/spec/all/*spec.js ./test/spec/node/*spec.js"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Kate Compton, Johnathan Pagnutti",
+  "license": "ISC",
+  "dependencies": {
+    "btoa": "^1.1.2",
+    "mongoose": "^4.7.6",
+    "node-uuid": "^1.4.7"
+  },
+  "devDependencies": {
+    "jasmine": "^2.5.3"
+  }
 }
