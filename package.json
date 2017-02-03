@@ -1,9 +1,23 @@
 {
-    "name": "Techne",
-    "main": "server.js",
-    "dependencies": {
-        "express": "~4.0.0",
-        "mongoose": "~3.6.13",
-        "body-parser": "~1.0.1"
-    }
+  "name": "techne",
+  "version": "0.3.0",
+  "description": "A semi-autonimous art bot commune that learns new techniques from each other!",
+  "main": "index.js",
+  "scripts": {
+    "test": "webpack && ./node_modules/.bin/jasmine ./test/spec/all/*spec.js ./test/spec/node/*spec.js"
+  },
+  "author": "Kate Compton, Johnathan Pagnutti",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^1.6.2",
+    "jquery": "^3.1.1",
+    "mongoose": "4.7.6",
+    "node-uuid": "^1.4.7",
+    "sharp": "^0.17.1",
+    "svg2img": "^0.2.8",
+    "webpack": "^2.2.1"
+  },
+  "devDependencies": {
+    "jasmine": "^2.5.3"
+  }
 }
