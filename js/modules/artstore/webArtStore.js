@@ -110,10 +110,17 @@ WebArtStore.prototype.findOldest = function(){
 
 /**
  * Return a generator that yeilds EVERY art in this Art Store
+ * @param {Function}  filter  function to pass to Array.filter() to return a generator
+ *                            only over the arts that we want to look at
  * @return {Generator} generator that gets every art in this artstore
  */
-WebArtStore.prototype.getArt = function*(){
-  for(let art of this.arts){
+WebArtStore.prototype.getArt = function*(filter){
+  var consideredArts = this.arts;
+  if(filter){
+    consideredArts = this.arts.filter(filter);
+  }
+
+  for(let art of consideredArts){
     yield art;
   }
 };

@@ -3,6 +3,7 @@
  * Maybe spruce this up with fancy CSS magic, @Kate?
  * @author Johnathan
  */
+/*jshint esversion: 6*/
 var $ = require('jquery');
 var Card = require('./card');
 

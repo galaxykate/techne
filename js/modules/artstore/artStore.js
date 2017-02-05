@@ -28,6 +28,18 @@ ArtStore.prototype = {
    */
   forget: function(){
     throw "Called ArtStore's forget method, should be overriden in a subclass";
+  },
+
+  /**
+   * Gets some number of the arts from the art store.  That number might be
+   * 0.
+   * @return {Undefined} May return arts.  Or Promise!
+   *                         TODO: this isn't a promise downstream, but it should be.
+   *                         Part of the weridness here is that implementing classes are currently
+   *                         returning generators.  Should the generators return promises?  Or a promise for a generator?
+   */
+  getArt: function(){
+    throw "Called ArtStore's getArt method, should be overriden in a subclass";
   }
 };
 

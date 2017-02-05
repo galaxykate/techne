@@ -7,7 +7,8 @@ module.exports = {
              './test/spec/all/artstore.spec.js',
              './test/spec/all/commonlib.spec.js',
              './test/spec/all/visualartist.spec.js',
-             './test/spec/web/webArtStore.spec.js']
+             './test/spec/web/webArtStore.spec.js',
+             './test/spec/web/webArtist.spec.js']
     },
     output: {
         path: path.join(__dirname, "dist"),

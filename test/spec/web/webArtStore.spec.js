@@ -1,6 +1,5 @@
 /**
  * Unit Tests for a WebArtStore
- * TODO do a better job at building this out
  */
 /*jshint esversion: 6*/
 var WebArtStore = require("../../../js/modules/artstore/webArtStore");
@@ -50,6 +49,63 @@ describe("Web Art Store", function(){
         expect(artstore.arts.length).toBe(0);
         done();
       }).catch(error => {console.error(error); fail();});
+  });
+
+  it("Testing Retrival of Art With No Filter", function(done){
+    var artistId = artist1.id;
+    artist1.createArt()
+      .then(() => {
+        artist1.createArt()
+          .then(() => {
+            for(let art of artstore.getArt()){
+              var authorTag = art.tags.filter(tag => tag.key == 'author')[0];
+              var typeTag = art.tags.filter(tag => tag.key == "type")[0];
+              var svgTag = art.tags.filter(tag => tag.key == "svg")[0];
+              var timeTag = art.tags.filter(tag => tag.key == "timestamp")[0];
+
+              expect(art.art).toBeTruthy();
+              expect(art.art instanceof Uint8ClampedArray).toBe(true);
+              expect(artistId).toEqual(authorTag.value);
+              expect(typeTag.value).toEqual("picture");
+              expect(svgTag.value).toBeTruthy();
+              expect(timeTag.value).toBeTruthy();
+
+              done();
+            }
+          });
+      });
+  });
+
+  it("Testing Retrival of Art With Filter", function(done){
+    var artistId = artist1.id;
+    var filter = (art) => {
+      var authorTag = art.tags.filter(tag => tag.key == "author")[0];
+      if(authorTag.value == artistId){
+        return true;
+      }
+      return false;
+    };
+
+    artist1.createArt()
+      .then(() => {
+        artist2.createArt()
+          .then(() => {
+            for(let art of artstore.getArt(filter)){
+              var authorTag = art.tags.filter(tag => tag.key == 'author')[0];
+              var typeTag = art.tags.filter(tag => tag.key == "type")[0];
+              var svgTag = art.tags.filter(tag => tag.key == "svg")[0];
+              var timeTag = art.tags.filter(tag => tag.key == "timestamp")[0];
+
+              expect(art.art).toBeTruthy();
+              expect(art.art instanceof Uint8ClampedArray).toBe(true);
+              expect(artistId).toEqual(authorTag.value);
+              expect(typeTag.value).toEqual("picture");
+              expect(svgTag.value).toBeTruthy();
+              expect(timeTag.value).toBeTruthy();
+              done();
+            }
+          });
+      });
   });
 
   it("Testing Implied Removal of Oldest Art", function(done){

@@ -16,8 +16,6 @@ var WebArtist = function(artStore){
   //being a little careful here, as arguments to this constructor can
   //come from anywhere.
   this.artStore = artStore instanceof WebArtStore ? artStore : undefined;
-  console.log("Web Artist Constructor: ", this, artStore);
-
 };
 
 WebArtist.prototype = commonlib.inherit(Artist.prototype);
@@ -27,12 +25,12 @@ WebArtist.prototype = commonlib.inherit(Artist.prototype);
  * @return {Promise} a promise that an art has been added to a webstore
  */
 WebArtist.prototype.publishArt = function(newArt){
-  console.log(this.artStore);
   return new Promise((resolve, reject) => {
     if(this.artStore){
       resolve(this.artStore.addArt(newArt));
+    }else{
+      reject("No Provided ArtStore!");
     }
-    throw "No Provided ArtStore!";
   });
 };
 
