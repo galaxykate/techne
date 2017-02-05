@@ -11,6 +11,7 @@ To bundle CommonJS modules for the browser, I'm currently using [webpack](https:
 
 The node SVG-to-Pixel code depends on two npm packages:
 1. [svg2img](https://www.npmjs.com/package/svg2img) for converting SVG strings to PNG images
+
 2. [sharp](http://sharp.dimens.io/) for extracting pixel data from PNG images
 
 Both of these packages are in the `package.json` file, and their installation instructions
@@ -49,10 +50,13 @@ together with code that can only run in the browser (broswerlib) or code that ca
 See the associated paper on Techne for which interfaces you might find useful.
 
 ## Running The Tests
-There are two environments we need to test Techne in: the browser and node.  
-1. .`npm test` bundles and tests Techne in a node environments
-2. .opening tests/SpecRunner.html in a browser tests Techne in a broswer (like Chrome or Firefox)
-3. .TODO: add an easy way to test in PhantomJS
+There are two environments we need to test Techne in: the browser and node.
+
+1. `npm test` bundles and tests Techne in a node environments
+
+2. opening tests/SpecRunner.html in a browser tests Techne in a broswer (like Chrome or Firefox)
+
+3. TODO: add an easy way to test in PhantomJS
 
 # Structure!
 What is where in the project:
@@ -61,6 +65,6 @@ What is where in the project:
   * *js/modules/artist* artist code.  Create/Evaluate art, push art to an art store, pull art back.  Currently, supporting code for art creation also lives here.
   * *js/modules/artstore* artstore code.  Space for holding onto arts, providing art to pull requests for it, etc.
   * *js/modules/views* UI code.  Views and Controllers to actually see arts or bots
-* *js/\*lib.js* library code.  All of this should eventually get mixed in to commonlib, and commonlib is the module to include if you need library functionality.  Other things of this pattern are environment specific implementations of code that we want to look general to bots, and will get mixed into commonlib.js
-* *js/\*Commune.js* code for setting up a commune.  Initalizes an artstore and some bots.
+* *js/&ast;lib.js* library code.  All of this should eventually get mixed in to commonlib, and commonlib is the module to include if you need library functionality.  Other things of this pattern are environment specific implementations of code that we want to look general to bots, and will get mixed into commonlib.js
+* *js/&ast;Commune.js* code for setting up a commune.  Initalizes an artstore and some bots.
 * *app.js* runs a WebCommune, gets bundled into __app.bundle.js__
