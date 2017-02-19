@@ -45,10 +45,23 @@ Artist.prototype = {
    * Try to send the provided art to an art store this artist knows about
    * Note: this function does not require the bot to specify which art store
    * to publish to, but that can be overriden by a subclass
-   * @param  {Art} art an art object
-   * @return {Promise}     a promise to send the art along to an art store
+   * @param  {ArtStore} artstore  the artstore to publish art too
+   * @param  {Art}      art       an art object
+   * @return {Promise}            a promise to send the art along to an art store
    */
-  publishArt: function(art){
+  publishArt: function(artstore, art){
+    throw "This function should be overriden by a subclass!";
+  },
+
+  /**
+   * Request art from an artstore.  Optionally provide a filtering function to
+   * only get certain art from certain locations.
+   * Filter functions work on tags.
+   * @param  {Object}   artstore  An ArtStore to request art from.
+   * @param  {Function} filter    A function to filter art by, based on how an art has been tagged
+   * @return {Promise}            A promise for art that fits the filter, if any exsists
+   */
+  requestArt: function(artstore, filter){
     throw "This function should be overriden by a subclass!";
   },
 
@@ -58,24 +71,7 @@ Artist.prototype = {
    * @return {Tag} a tag with rhe relevant values
    */
   createAuthorTag: function(){
-    var authorTag = new Tag();
-    authorTag.key = "author";
-    authorTag.value = this.id; //Artists sign with their GUID, rather than name.
-
-    return authorTag;
-  },
-
-  /**
-   * create a timestamp tag.  A Timestamp tag is a tag with a key of 'timestamp'
-   * and a value of the current time (via Date.now())
-   * @return {Tag} a tag with the relevant values
-   */
-  createTimestampTag: function(){
-    var timestampTag = new Tag();
-    timestampTag.key = "timestamp";
-    timestampTag.value = String(Date.now());
-
-    return timestampTag;
+    return "author:" + this.id;
   },
 
   /**
@@ -85,7 +81,7 @@ Artist.prototype = {
    * this art was created.
    */
   signArt: function(){
-    return [this.createAuthorTag(), this.createTimestampTag()];
+    return [this.createAuthorTag()];
   }
 };
 

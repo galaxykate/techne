@@ -2,6 +2,7 @@
  * Library of browser-specific code.  Module expects to be in an environment
  * with a DOM, document object, window object, etc.
  */
+/*jshint esversion: 6*/
 
 var $ = require('jquery');
 var lib = {
@@ -52,6 +53,31 @@ var lib = {
     wrapper.prototype = this.inherit(mongooseObj.Document.prototype);
     return wrapper;
   },
+
+  /**
+   * Use the DOM to parse a uri string
+   * @param  {string} uri uri!
+   * @return {Object}     parsed URI string
+   */
+  parseUri: function(uri){
+    var result = {}, index, prop, a = document.createElement('a'),
+       props = 'protocol hostname host pathname port search hash href'.split(' ');
+
+    a.href = uri;
+    // Copy relevant properties
+    for (index in props) {
+      prop = props[index];
+      result[prop] = a[prop];
+    }
+    // For window.location compatibility
+    result.toString = () => a.href;
+    result.requestUri = a.pathname + a.search;
+
+    // For JSON compatability.
+    result.toJSON = result.toString;
+
+    return result;
+  }
 };
 
 module.exports = lib;

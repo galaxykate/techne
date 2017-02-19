@@ -23,17 +23,18 @@ describe("VisualArtist", function(){
 
   it("Create Art", function(done){
     visualArtist.createArt().then((art) => {
-      expect(art.art instanceof Uint8ClampedArray).toBe(true); //TODO stronger tests here
+      expect(art.art instanceof Object).toBe(true); //TODO can't pass around a Uint8ClampedArray, because dumb.
+      expect(art.art.pixels).toBeTruthy();
+      expect(art.art.pixels instanceof Array);
+      expect(art.art.width).toBe(90 + "");
+      expect(art.art.height).toBe(120 + "");
+      expect(art.art.svg).toBeTruthy();
 
-      var widthTag = art.tags.filter(tag => tag.key == 'width')[0];
-      var heightTag = art.tags.filter(tag => tag.key == 'height')[0];
-      var typeTag = art.tags.filter(tag => tag.key == 'type')[0];
-      var svgTag = art.tags.filter(tag => tag.key == 'svg')[0];
+      var authorTag = art.tags.filter(tag => tag.includes("author"))[0];
+      var mediumTag = art.tags.filter(tag => tag.includes("medium"))[0];
+      expect(authorTag).toBeTruthy();
+      expect(mediumTag).toBeTruthy();
 
-      expect(widthTag.value).toBe("90");
-      expect(heightTag.value).toBe("120");
-      expect(typeTag.value).toBe("picture");
-      expect(svgTag).toBeTruthy();
       done();
     });
   });

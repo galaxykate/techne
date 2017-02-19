@@ -24,10 +24,24 @@ WebArtist.prototype = commonlib.inherit(Artist.prototype);
  * Add the provided art to the webartstore that this artist knows about
  * @return {Promise} a promise that an art has been added to a webstore
  */
-WebArtist.prototype.publishArt = function(newArt){
+WebArtist.prototype.publishArt = function(artstore, newArt){
   return new Promise((resolve, reject) => {
-    if(this.artStore){
-      resolve(this.artStore.addArt(newArt));
+    if(artstore){
+      resolve(artstore.addArt(newArt));
+    }else{
+      reject("No Provided ArtStore!");
+    }
+  });
+};
+
+WebArtist.prototype.requestArt = function(artstore, filter){
+  return new Promise((resolve, reject) => {
+    if(artstore){
+      var relevantArts = [];
+      for(let art of artstore.getArt(filter)){
+        relevantArts.push(art);
+      }
+      resolve(relevantArts);
     }else{
       reject("No Provided ArtStore!");
     }

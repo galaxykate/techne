@@ -30,7 +30,6 @@ describe("Web Art Store", function(){
   });
 
   it("Testing Adding Published", function(done){
-    console.log("A WebVisualArtist Object:", artist1);
     artist1.createArt()
       .then(() => {
         expect(artstore.arts.length).toBe(1);
@@ -42,7 +41,7 @@ describe("Web Art Store", function(){
     }).catch(error => {console.error(error); fail();});
   });
 
-  it("Testing Direct Removal of Art", function(done){
+  xit("Testing Direct Removal of Art", function(done){
     artist1.createArt()
       .then(() => {
         artstore.forget();
@@ -58,17 +57,17 @@ describe("Web Art Store", function(){
         artist1.createArt()
           .then(() => {
             for(let art of artstore.getArt()){
-              var authorTag = art.tags.filter(tag => tag.key == 'author')[0];
-              var typeTag = art.tags.filter(tag => tag.key == "type")[0];
-              var svgTag = art.tags.filter(tag => tag.key == "svg")[0];
-              var timeTag = art.tags.filter(tag => tag.key == "timestamp")[0];
+              var authorTag = art.tags.filter(tag => tag.includes('author'))[0];
+              var mediumTag = art.tags.filter(tag => tag.includes('medium'))[0];
+              var svg = art.art.svg;
+              var width = art.art.width;
+              var height = art.art.height;
 
               expect(art.art).toBeTruthy();
-              expect(art.art instanceof Uint8ClampedArray).toBe(true);
-              expect(artistId).toEqual(authorTag.value);
-              expect(typeTag.value).toEqual("picture");
-              expect(svgTag.value).toBeTruthy();
-              expect(timeTag.value).toBeTruthy();
+              expect(art.art instanceof Array).toBe(true);
+              expect(authorTag.includes(artistId)).toBe(true);
+              expect(mediumTag).toEqual("medium:picture");
+              expect(svg).toBeTruthy();
 
               done();
             }
@@ -78,9 +77,9 @@ describe("Web Art Store", function(){
 
   it("Testing Retrival of Art With Filter", function(done){
     var artistId = artist1.id;
-    var filter = (art) => {
-      var authorTag = art.tags.filter(tag => tag.key == "author")[0];
-      if(authorTag.value == artistId){
+    var myOwnArtFilter = (art) => {
+      var authorTag = art.tags.filter(tag => tag.includes("author"))[0];
+      if(authorTag.includes(artistId)){
         return true;
       }
       return false;
@@ -90,25 +89,26 @@ describe("Web Art Store", function(){
       .then(() => {
         artist2.createArt()
           .then(() => {
-            for(let art of artstore.getArt(filter)){
-              var authorTag = art.tags.filter(tag => tag.key == 'author')[0];
-              var typeTag = art.tags.filter(tag => tag.key == "type")[0];
-              var svgTag = art.tags.filter(tag => tag.key == "svg")[0];
-              var timeTag = art.tags.filter(tag => tag.key == "timestamp")[0];
+            for(let art of artstore.getArt(myOwnArtFilter)){
+              var authorTag = art.tags.filter(tag => tag.includes('author'))[0];
+              var mediumTag = art.tags.filter(tag => tag.includes('medium'))[0];
+              var svg = art.art.svg;
+              var width = art.art.width;
+              var height = art.art.height;
 
               expect(art.art).toBeTruthy();
-              expect(art.art instanceof Uint8ClampedArray).toBe(true);
-              expect(artistId).toEqual(authorTag.value);
-              expect(typeTag.value).toEqual("picture");
-              expect(svgTag.value).toBeTruthy();
-              expect(timeTag.value).toBeTruthy();
+              expect(art.art instanceof Array).toBe(true);
+              expect(authorTag.includes(artistId)).toBe(true);
+              expect(mediumTag).toEqual("medium:picture");
+              expect(svg).toBeTruthy();
+
               done();
             }
           });
       });
   });
 
-  it("Testing Implied Removal of Oldest Art", function(done){
+  xit("Testing Implied Removal of Oldest Art", function(done){
     artist1.createArt()
       .then(() => {
         setTimeout(function(){

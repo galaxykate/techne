@@ -37,17 +37,19 @@ WebCommune.prototype = {
   initalize: function(){
     //FIXME hardcoded intalization constants.
     //Hopefully will be good enough to show at some point (probs not ADL)
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < 2; i++){
       this.addMember();
       var newArtist = this.members[i];
-      for(let j = 0; j < 3; j++){
-        newArtist.createNewArt(); //Returns a promise, but we don't need to do anything with that here.
+      for(let j = 0; j < 1; j++){
+        newArtist.createArt().then(() => {
+          //grab an artist, have them evaluate all arts in the commune
+          var artist = this.members[0];
+          artist.createCritique().then(() => {
+            console.log("Artstore State: ",this.arts);
+          });
+        });
       }
     }
-
-    //FIXME fast logging so I can get a build of this off the ground
-    console.log(this.members);
-    console.log(this.arts);
   }
 };
 

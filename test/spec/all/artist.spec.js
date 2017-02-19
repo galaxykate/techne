@@ -5,7 +5,6 @@
 /*jshint esversion: 6 */
 /*jslint node: true */
 var Artist = require("../../../js/modules/artist/artist");
-var Tag = require("../../../js/models/tag");
 
 describe("Artist", function(){
   var artist;
@@ -29,30 +28,20 @@ describe("Artist", function(){
 
   it("Create Author Tag", function(){
     var tag = artist.createAuthorTag();
-    expect(tag instanceof Tag);
-    expect(tag.key == 'author').toBe(true);
-    expect(tag.value == artist.id).toBe(true);
+    console.log("Tag: ", tag);
+    expect(tag instanceof String);
+    expect(tag.includes("author")).toBe(true);
+    //TODO: test the things wi  th a UUID
   });
 
-  it("Create Timestamp Tag", function(){
-    var tag = artist.createTimestampTag();
-    expect(tag instanceof Tag).toBe(true);
-    expect(tag.key == 'timestamp').toBe(true);
-
-    var tagTime = new Date(parseInt(tag.value, 10));
-    expect(tagTime.getTime()).toBeGreaterThan(0);
-    expect(tagTime.getTime()).not.toBeGreaterThan(Date.now());
-   });
-
    it("Sign Art", function(){
+     //TODO need WAY better testing here.
     var taglist = artist.signArt();
     //check for the exsistance of the correct keys
-    var authorTag = taglist.filter(item => item.key == 'author');
-    var timestampTag = taglist.filter(item => item.key == 'timestamp');
+    var authorTag = taglist.filter(item => item.includes('author'));
 
-    expect(taglist.length).toEqual(2);
+    expect(taglist.length).toEqual(1);
 
     expect(authorTag).toBeTruthy();
-    expect(timestampTag).toBeTruthy(true);
   });
 });

@@ -41,7 +41,7 @@ describe("Web Artist Testing", function(){
 
   it("Test Publish Art (throwing errors)", function(done){
     webArtist = new WebArtist();
-    webArtist.publishArt({}).catch(err => {
+    webArtist.publishArt(undefined).catch(err => {
       expect(err).toBe("No Provided ArtStore!");
       done();
     });

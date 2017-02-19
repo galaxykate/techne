@@ -3,6 +3,7 @@ var webpack = require('webpack');
 module.exports = {
     entry: {
       app: "./app.js",
+      nodeApp: "./nodeApp.js",
       test: ['./test/spec/all/artist.spec.js',
              './test/spec/all/artstore.spec.js',
              './test/spec/all/commonlib.spec.js',

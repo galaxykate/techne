@@ -9,10 +9,14 @@
   "author": "Kate Compton, Johnathan Pagnutti",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.16.0",
     "canvas": "^1.6.2",
+    "d3": "^4.5.1",
+    "express": "^4.14.1",
     "jquery": "^3.1.1",
     "mongoose": "4.7.6",
     "node-uuid": "^1.4.7",
+    "request": "^2.79.0",
     "sharp": "^0.17.1",
     "svg2img": "^0.2.8",
     "webpack": "^2.2.1"

@@ -34,12 +34,29 @@ WebVisualArtist.prototype = commonlib.inherit(VisualArtist.prototype);
 WebVisualArtist.prototype.createArt = function(){
   var newArtPromise = VisualArtist.prototype.createArt.apply(this);
   return newArtPromise.then(newArt => {
-    return this.publishArt(newArt);
+    return this.publishArt(this.artStore, newArt);
   });
 };
 
+WebVisualArtist.prototype.createCritique = function(){
+  return this.requestArt(this.artStore, art => art.tags.filter(tag => tag.key == "type")[0].value == "picture")
+    .then(arts => {
+      var selectedArt = arts[Math.floor(Math.random() * arts.length)];
+      if(selectedArt){
+        var critiquePromise = VisualArtist.prototype.evaluateArt.apply(this, [selectedArt]);
+        critiquePromise.then(newCrit => {
+          console.log("New Crit: ", newCrit.art);
+          return this.publishArt(this.artStore, newCrit);
+        });
+      }
+    });
+};
+
+
+
 //TODO find a way to programatically do this, or restructure.
 WebVisualArtist.prototype.publishArt = WebArtist.prototype.publishArt;
+WebVisualArtist.prototype.requestArt = WebArtist.prototype.requestArt;
 WebVisualArtist.prototype.setPublishLocation = WebArtist.prototype.setPublishLocation;
 
 module.exports = WebVisualArtist;

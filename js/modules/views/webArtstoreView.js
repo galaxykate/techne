@@ -11,6 +11,7 @@ var WebArtStoreView = function(webArtStore){
   this.artStore = webArtStore;
   this.div = $(".page-content");
   //add event handling here?
+
   this.artStore.addEventListener("New Art", () => {
     //@TODO this might explode
     this.clearView();
@@ -34,7 +35,18 @@ WebArtStoreView.prototype = {
    * @return {None} just modifies the DOM, does not return
    */
   updateView: function(){
-    for(let art of this.artStore.getArt()){
+    var artGenerator = this.artStore.getArt(art => {
+      var typeTag = art.tags.filter(tag => tag.key == "type")[0];
+      if(typeTag.value == "picture"){
+        return true;
+      }
+      return false;
+    });
+
+    for(let art of artGenerator){
+      var width = Number(art.tags.filter(tag => tag.key == "width")[0].value, 10);
+      var height = Number(art.tags.filter(tag => tag.key == "height")[0].value, 10);
+
       var card = new Card(this.div, art, {
     		title: "Untitled Art",
     		classes: "card-art card-art",
@@ -45,19 +57,14 @@ WebArtStoreView.prototype = {
     	card.art = $("<div/>", {
     		class: "art-thumbnail",
     	}).appendTo(card.contents);
-      //wrap the core HTML img object, add it to the card.
-      $(art.art).appendTo(card.art);
 
-      //var card = new Card(this.div, {});
-      //$(art.art).appendTo(card.contents);
-      //this.div.append(art.art);
-      /**
-      var newCanvas = ($('<canvas />'))[0];
-      var ctx = newCanvas.getContext('2d');
-      var img = art.art[0];
-      ctx.drawImage(img);
-      this.div.append(newCanvas);
-      */
+      card.picture = $("<canvas />", {
+      }).appendTo(card.art);
+      var ctx = card.picture[0].getContext('2d');
+      var imgData = new ImageData(width, height);
+      imgData.data.set(Uint8ClampedArray.from(art.art));
+
+      ctx.putImageData(imgData, 0, 0);
     }
   }
 };

@@ -31,7 +31,7 @@ var WebArtStore = function(maxArts){
   this.dispatchEvent = target.dispatchEvent.bind(target);
   //END thinking @TODO
 
-  this.maxNumArts = maxArts >= 0 ? maxArts : 0;
+  this.maxNumArts = maxArts >= 0 ? maxArts : Infinity;
   this.arts = [];
 };
 
@@ -52,7 +52,7 @@ WebArtStore.prototype.addArt = function(art){
       commonlib.reportMongooseError(error);
       reject(error);
     }else{
-      this.openSpace();
+      //this.openSpace();
       this.arts.push(art);
 
       //If we decide to NOT use DOM event wrapping, we also need to change these lines
@@ -67,28 +67,30 @@ WebArtStore.prototype.addArt = function(art){
 /**
  * Remove the oldest art from the WebStore
  * @return {Undefined} This function does not return, just modifies stuff
- */
+
 WebArtStore.prototype.forget = function(){
   //search the art store for the oldest art and splice it
   var oldestIndex = this.findOldest();
   this.arts.splice(oldestIndex, 1);
 };
-
+*/
 /**
  * Open a space in the ArtStore.  If space exists, don't worry about it.
  * If the store is full, forget an art.
  * @return {Undefined} Function just modifies state
- */
+
 WebArtStore.prototype.openSpace = function(){
   if(this.arts.length >= this.maxNumArts){
     this.forget();
   }
 };
+*/
 
+/**
 /**
  * Get the oldest art.  Return it's index.
  * @return {Number} the index in the backing array where this art is stored
- */
+
 WebArtStore.prototype.findOldest = function(){
   var oldestIdx = 0;
   var oldestTime = new Date(this.arts[0].tags.filter(tag => tag.key == 'timestamp')[0].value);
@@ -107,6 +109,7 @@ WebArtStore.prototype.findOldest = function(){
 
   return oldestIdx;
 };
+*/
 
 /**
  * Return a generator that yeilds EVERY art in this Art Store

@@ -9,8 +9,6 @@
 var mongoose  = require('mongoose');
 var uuid = require('node-uuid');
 var Schema    = mongoose.Schema;
-var TagConstructor = require('./tag');
-var Tag = new TagConstructor().schema;
 var lib = require('../modules/commonlib'); //extra code to do things that might be shared among a lot of modules
 
 //some extra custom validation functions
@@ -18,32 +16,14 @@ var lib = require('../modules/commonlib'); //extra code to do things that might 
 /**
  * Validate if a tag is a correct author tags.
  * Author tags have a key of "author" and a value of a valid UUID string
- * @param  {Tag} tag a tag object
+ * @param  {String} tag contents of an author tag!
  * @return {Boolean}     true if the tag passes validation, false if otherwise
  */
-function validateAuthor(tag){
+function validateUUID(tag){
   //http://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid
   //FIXME not entirely true to fit all potential UUID schemes, assumes things like
   //dashes, but works for now.
-  if(tag.key == 'author'){
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/.test(tag.value);
-  }
-
-  return false;
-}
-
-/**
- * Validate if a set of tags contains a date tag that is the corret timestamp
- * date tags have a key of "timestamp" and a Date-parsable value
- * @param  {Tag} tag a tag object
- * @return {Boolean}     true if the tag passes validation, false if otherwise
- */
-function validateTimestamp(tag){
-  if(tag.key == "timestamp"){
-    return (new Date(parseInt(tag.value, 10)).getTime()) > 0; //specifying a radix for parseInt, want it to fail if given anything not base-10
-  }
-
-  return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/.test(tag);
 }
 
 /**
@@ -51,25 +31,22 @@ function validateTimestamp(tag){
  * @type {Schema}
  */
 var ArtSchema = new Schema({
-  tags: {type: [Tag],
+  tags: {type: [String],
     validate: [
       {
         //Need at least two tags! Author and timestamp.
-        validator: v => v.length < 2 ? false : true,
-        message : "Need at least two tags, author and timestamp"
+        validator: v => v.length < 1 ? false : true,
+        message : "Need at least one tags: author"
       },
       {
         validator: v => {
-          return validateAuthor(v.filter(item => item.key == "author")[0]);
+          console.log(v);
+          var authorTag = v.filter(tag => tag.includes("author"))[0];
+
+          return validateUUID(authorTag.slice(authorTag.indexOf(":") + 1));
         },
         message: "Unable to find valid author tag"
       },
-      {
-        validator: v => {
-          return validateTimestamp(v.filter(item => item.key == "timestamp")[0]);
-        },
-        message: "Unable to find valid timestep tag"
-      }
     ],
     required: true},
   art:  {type: Schema.Types.Mixed, required: true}
