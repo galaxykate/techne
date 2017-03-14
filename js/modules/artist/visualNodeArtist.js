@@ -10,7 +10,6 @@ var commonlib = require('../commonlib');
 var $ = require('jquery');
 
 var NodeVisualArtist = function(){
-  console.log("In NodeVisualArtist constructor:");
   //Multiple inheritance with JavaScript!
   VisualArtist.apply(this, arguments);
 
@@ -77,8 +76,7 @@ NodeVisualArtist.prototype.createCritique = function(){
       }
     })
     .then(newCrit => {
-      console.log("New Crit:", newCrit);
-      return this.publishArt(this.artStore, newCrit);
+      return newCrit !== undefined ? this.publishArt(this.artStore, newCrit) : new Promise();
     });
 };
 
@@ -108,11 +106,10 @@ NodeVisualArtist.prototype.requestCritique = function(){
           }) ? tag : undefined;
         }
       });
-      console.log("Tags:", authorTag, mediumTag, sourceTag);
       return authorTag && mediumTag && sourceTag;
     })
     .then(crits => {
-      console.log("Got:", crits);
+      console.log("Got #", crits.length);
       var selectedCrit = crits[Math.floor(Math.random() * crits.length)];
       return selectedCrit;
     });

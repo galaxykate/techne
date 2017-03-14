@@ -13,6 +13,7 @@ var http = require("http");
 var Art = require("../../models/art");
 var Tag = require("../../models/tag");
 
+var TextEncoder = require('text-encoding');
 var NodeArtist = function(artStoreLoc){
   Artist.apply(this);
 

@@ -5,6 +5,7 @@
  *
  * @TODO this will probably need to be fleshed out somewhat.
  */
+/*jshint esversion: 6*/
 
 var WebArtStore = require('./artstore/webArtStore');
 var WebVisualArtist = require('./artist/visualWebArtist');

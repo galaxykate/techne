@@ -39,7 +39,7 @@ WebVisualArtist.prototype.createArt = function(){
 };
 
 WebVisualArtist.prototype.createCritique = function(){
-  return this.requestArt(this.artStore, art => art.tags.filter(tag => tag.key == "type")[0].value == "picture")
+  return this.requestArt(this.artStore, art => art.tags.find(tag => tag.key == "type").value == "picture")
     .then(arts => {
       var selectedArt = arts[Math.floor(Math.random() * arts.length)];
       if(selectedArt){
