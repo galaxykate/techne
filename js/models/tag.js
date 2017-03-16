@@ -1,5 +1,6 @@
 /**
  * @author Johnathan
+ * @FIXME UNUSED, TAGS ARE JUST STRINGS NOW
  * Model of a tag.  Tags a pair of strings in a key-value pair
  * Lets us do searches based on things like 'author' but an artist can add
  * whatever tags they want

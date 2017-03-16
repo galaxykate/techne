@@ -38,15 +38,14 @@ var ArtSchema = new Schema({
         validator: v => v.length < 1 ? false : true,
         message : "Need at least one tags: author"
       },
-      {
-        validator: v => {
-          console.log(v);
-          var authorTag = v.filter(tag => tag.includes("author"))[0];
+      //{
+      //  validator: v => {
+      //    var authorTag = v.filter(tag => tag.includes("author"))[0];
 
-          return validateUUID(authorTag.slice(authorTag.indexOf(":") + 1));
-        },
-        message: "Unable to find valid author tag"
-      },
+      //    return validateUUID(authorTag.slice(authorTag.indexOf(":") + 1));
+      //  },
+      //  message: "Unable to find valid author tag"
+      //},
     ],
     required: true},
   art:  {type: Schema.Types.Mixed, required: true}

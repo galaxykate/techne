@@ -50,10 +50,14 @@ NodeVisualArtist.prototype.createArt = function(){
       console.log("At", this.artStoreLoc);
       return this.publishArt(this.artStoreLoc, newArt);
     })
-    .then(art => {
+    .then(idSet => {
       //we get the art we just published as a response
       //We don't do our own id'ing, the ArtStore may handle that for us
-      this.artIds.push(art._id !== undefined ? art._id : console.error("Unable to save my art ids!"));
+      this.artIds.push(idSet.artID !== undefined ? idSet.artID : console.error("Unable to save my art ids!"));
+      if(this.id === undefined){
+        //we don't have an id for ourselves yet, lets get one.
+        this.id = tidSet.artistID !== undefined ? idSet.artistID : console.error("Unable to get an id for myself!");
+      }
       return art;
     });
 };

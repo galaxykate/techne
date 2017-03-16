@@ -16,7 +16,7 @@ var uuid = require('node-uuid');
  */
 var Artist = function(){
   this.name = ""; //reserved some space here for fun bots names, but they aren't critical to Techne
-  this.id = uuid.v4();
+  this.id = undefined;
 
   this.generators = undefined;
   this.evaluators = undefined;
@@ -81,7 +81,11 @@ Artist.prototype = {
    * this art was created.
    */
   signArt: function(){
-    return [this.createAuthorTag()];
+    if(this.id){
+      return [this.createAuthorTag()];
+    }else{
+      return []; //can't sign yet, we don't have an ID.
+    }
   }
 };
 

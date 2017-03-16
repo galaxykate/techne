@@ -10,6 +10,7 @@ var mongoose   = require('mongoose');
 
 var Art         = require('../../models/art');
 var Tag         = require('../../models/tag');
+var Artist      = require('../../models/artist');
 mongoose.Promse = global.Promise;           //native promises.
 
 // configure app to use bodyParser()
@@ -58,6 +59,15 @@ router.post('/art', function(req, res){
   art.art = req.body.art;
   art.tags = req.body.tags;
 
+  //create an author ID if none exists yet for this bot (isn't signing with a valid author tag)
+  var artist;
+  var authorTag = art.tags.find(tag => tag.includes("author"));
+  if(!authorTag){
+    artist = new Artist();
+    authorTag = "author:" + artist._id;
+    art.tags.push(authorTag);
+  }
+
   art.markModified('art');
   art.save()
   .then((savedArt, numAffected, err) => {
@@ -65,7 +75,15 @@ router.post('/art', function(req, res){
     console.log("ResponseID", savedArt._id);
     console.log("ModelID", art._id);
     console.log("ProvidedID", req.body._id);
-    res.json({'art': savedArt});
+    var ret = {
+      artID: savedArt._id,
+      artistID: authorTag.substring(authorTag.indexOf(":"))
+    };
+    res.json(ret);
+    //it doesn't really matter for sending a message back, so if we have a new artist, save it
+    if(artist !== undefined){
+      artist.save();
+    }
   });
 });
 
@@ -133,6 +151,21 @@ router.get('/influence', function(req, res){
       res.json(influence);
     });
 });
+
+/**
+Endpoint takes an empty POST request and clears the db of all arts and artists
+*/
+router.post('/clear', function(req, res){
+  Art.remove({})
+  .then((err) => {
+    if(err){
+      res.send(err);
+    }else{
+      res.json({'message':'success'});
+    }
+  });
+});
+
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/techne', router);
